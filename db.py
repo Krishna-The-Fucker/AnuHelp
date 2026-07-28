@@ -245,7 +245,238 @@ async def reset_warn(chat_id, user_id):
 # ==========================================================
 
 async def set_nsfw(chat_id, status):
+
     await db.nsfw.update_one(
         {"chat_id": chat_id},
-        {"$set": {"enabled": status}},
-        upsert
+        {
+            "$set": {
+                "enabled": status
+            }
+        },
+        upsert=True
+    )
+
+    cache_set(f"nsfw:{chat_id}", status)
+
+
+
+async def get_nsfw(chat_id):
+
+    cached = cache_get(f"nsfw:{chat_id}")
+
+    if cached is not None:
+        return cached
+
+
+    data = await db.nsfw.find_one(
+        {"chat_id": chat_id}
+    )
+
+
+    status = data.get(
+        "enabled",
+        DEFAULT["nsfw"]
+    ) if data else DEFAULT["nsfw"]
+
+
+    cache_set(
+        f"nsfw:{chat_id}",
+        status
+    )
+
+    return status
+
+
+
+# ==========================================================
+# 👤 USER SYSTEM (BROADCAST)
+# ==========================================================
+
+async def add_user(user_id, name):
+
+    await db.users.update_one(
+        {"user_id": user_id},
+        {
+            "$set": {
+                "name": name,
+                "updated": datetime.utcnow()
+            }
+        },
+        upsert=True
+    )
+
+
+
+async def get_all_users():
+
+    users = []
+
+    async for user in db.users.find():
+
+        users.append(
+            user["user_id"]
+        )
+
+    return users
+
+
+
+# ==========================================================
+# 📢 LOG CHANNEL
+# ==========================================================
+
+async def set_log_channel(chat_id, channel_id):
+
+    await db.logs.update_one(
+        {"chat_id": chat_id},
+        {
+            "$set": {
+                "channel": channel_id
+            }
+        },
+        upsert=True
+    )
+
+
+
+async def get_log_channel(chat_id):
+
+    data = await db.logs.find_one(
+        {"chat_id": chat_id}
+    )
+
+    return data.get(
+        "channel"
+    ) if data else None
+
+
+
+# ==========================================================
+# ✏️ ANTI EDIT
+# ==========================================================
+
+async def set_antiedit(chat_id, status):
+
+    await db.antiedit.update_one(
+        {"chat_id": chat_id},
+        {
+            "$set": {
+                "enabled": status
+            }
+        },
+        upsert=True
+    )
+
+
+
+async def get_antiedit(chat_id):
+
+    data = await db.antiedit.find_one(
+        {"chat_id": chat_id}
+    )
+
+    return data.get(
+        "enabled",
+        DEFAULT["antiedit"]
+    ) if data else DEFAULT["antiedit"]
+
+
+
+# ==========================================================
+# 👋 WELCOME SYSTEM
+# ==========================================================
+
+async def set_welcome(chat_id, status):
+
+    await db.welcome.update_one(
+        {"chat_id": chat_id},
+        {
+            "$set": {
+                "enabled": status
+            }
+        },
+        upsert=True
+    )
+
+
+
+async def get_welcome(chat_id):
+
+    data = await db.welcome.find_one(
+        {"chat_id": chat_id}
+    )
+
+    return data.get(
+        "enabled",
+        DEFAULT["welcome"]
+    ) if data else DEFAULT["welcome"]
+
+
+
+# ==========================================================
+# 🛡 ANTIRAID
+# ==========================================================
+
+async def set_antiraid(chat_id, status):
+
+    await db.antiraid.update_one(
+        {"chat_id": chat_id},
+        {
+            "$set": {
+                "enabled": status
+            }
+        },
+        upsert=True
+    )
+
+
+
+async def get_antiraid(chat_id):
+
+    data = await db.antiraid.find_one(
+        {"chat_id": chat_id}
+    )
+
+    return data.get(
+        "enabled",
+        False
+    ) if data else False
+
+
+
+# ==========================================================
+# ⚙️ INDEXES
+# ==========================================================
+
+async def create_indexes():
+
+    await db.users.create_index(
+        "user_id",
+        unique=True
+    )
+
+    await db.warns.create_index(
+        [
+            ("chat_id", 1),
+            ("user_id", 1)
+        ]
+    )
+
+    await db.language.create_index(
+        "chat_id",
+        unique=True
+    )
+
+    await db.night_mode.create_index(
+        "chat_id",
+        unique=True
+    )
+
+    await db.settings.create_index(
+        "chat_id",
+        unique=True
+    )
+
+    logger.info(
+        "✅ Database Indexes Created"
+    )
