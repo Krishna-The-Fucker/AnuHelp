@@ -1,5 +1,5 @@
 # ============================================================
-# 🤖 HANDLERS LOADER (ULTRA PRO MAX FINAL + SUDO + SAFE)
+# 🤖 HANDLERS LOADER (ULTRA PRO MAX FINAL + NIGHT MODE ADDED)
 # ============================================================
 
 import logging
@@ -18,7 +18,7 @@ logging.basicConfig(
 logger = logging.getLogger("ULTRA-BOT")
 
 # ============================================================
-# 🛡 SAFE IMPORT FUNCTION (IMPROVED)
+# 🛡 SAFE IMPORT FUNCTION
 # ============================================================
 
 def safe_import(module_name: str, func_name: str):
@@ -36,7 +36,7 @@ def safe_import(module_name: str, func_name: str):
 
 
 # ============================================================
-# 📦 MAIN MODULES LIST
+# 📦 MODULES LIST (UPDATED)
 # ============================================================
 
 MODULES = [
@@ -51,7 +51,10 @@ MODULES = [
     ("Locks System", "handlers.locks", "register_locks"),
     ("Anti Bio Link", "handlers.antibiolink", "register_antibiolink"),
 
-    # ================= 🌍 LANGUAGE SYSTEM =================
+    # ================= 🌙 NIGHT MODE =================
+    ("Night Mode", "handlers.night_mode", "register_night_mode"),
+
+    # ================= 🌍 LANGUAGE =================
     ("Language System", "handlers.language_handler", "register_language"),
 
     # ================= SECURITY =================
@@ -71,7 +74,7 @@ MODULES = [
     ("Admin Panel", "handlers.adminpanel", "register_admin_panel"),
     ("Approval System", "handlers.approve", "register_approval_handlers"),
 
-    # ================= 👑 SUDO SYSTEM =================
+    # ================= 👑 SUDO =================
     ("Sudo System", "handlers.sudo", "register"),
 
     # ================= UTIL =================
@@ -82,7 +85,7 @@ MODULES = [
 ]
 
 # ============================================================
-# 🚨 SPECIAL HANDLERS (DIRECT ADD)
+# 🚨 SPECIAL HANDLERS
 # ============================================================
 
 SPECIAL_HANDLERS = [
@@ -92,22 +95,19 @@ SPECIAL_HANDLERS = [
 ]
 
 # ============================================================
-# 🧠 MAIN LOADER FUNCTION (UPGRADED)
+# 🧠 MAIN LOADER (UPDATED FOR NIGHT MODE)
 # ============================================================
 
-def register_all_handlers(app):
+def register_all_handlers(app, db, LOG_CHANNEL):
 
     logger.info("🚀 Booting Ultra Bot System...\n")
     start_time = time.time()
 
     loaded = 0
     failed = 0
-    loaded_modules = set()  # 🔥 prevent duplicate load
+    loaded_modules = set()
 
-    # ========================================================
-    # 🔄 LOAD NORMAL MODULES
-    # ========================================================
-
+    # ================= LOAD MODULES =================
     for name, module, func_name in MODULES:
 
         if module in loaded_modules:
@@ -126,7 +126,11 @@ def register_all_handlers(app):
         try:
             t1 = time.time()
 
-            func(app)
+            # 🔥 SPECIAL CASE FOR NIGHT MODE
+            if module == "handlers.night_mode":
+                func(app, db, LOG_CHANNEL)
+            else:
+                func(app)
 
             t2 = time.time()
 
@@ -138,10 +142,7 @@ def register_all_handlers(app):
             logger.error(f"❌ Crash → {name} → {e}")
             failed += 1
 
-    # ========================================================
-    # 🚨 LOAD SPECIAL HANDLERS
-    # ========================================================
-
+    # ================= SPECIAL HANDLERS =================
     for name, module, handler_name in SPECIAL_HANDLERS:
 
         logger.info(f"🔥 Adding → {name}")
@@ -162,10 +163,7 @@ def register_all_handlers(app):
             logger.error(f"❌ Error → {name} → {e}")
             failed += 1
 
-    # ========================================================
-    # 📊 FINAL REPORT
-    # ============================================================
-
+    # ================= FINAL REPORT =================
     total_time = round(time.time() - start_time, 2)
 
     logger.info("\n" + "=" * 50)
