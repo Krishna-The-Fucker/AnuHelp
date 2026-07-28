@@ -53,8 +53,10 @@ DEFAULT = {
     "pinned": None,
     "antibiolink": False,
     "captcha": True,
-    "night_mode": False
+   "night_mode": False
+   "broadcast":True
 }
+
 
 # ==========================================================
 # 👑 SUDO SYSTEM
