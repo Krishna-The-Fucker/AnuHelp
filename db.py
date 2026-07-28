@@ -53,7 +53,7 @@ DEFAULT = {
     "pinned": None,
     "antibiolink": False,
     "captcha": True,
-   "night_mode": False
+   "night_mode": False,
    "broadcast":True
 }
 
@@ -469,10 +469,11 @@ async def create_indexes():
         unique=True
     )
 
-    await db.night_mode.create_index(
-        "chat_id",
-        unique=True
-    )
+    
+await db.settings.create_index(
+    "chat_id",
+    unique=True
+)
 
     await db.settings.create_index(
         "chat_id",
