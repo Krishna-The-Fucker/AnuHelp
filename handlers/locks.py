@@ -1,191 +1,205 @@
 # ============================================================
-# 🔒 LOCK SYSTEM (ULTIMATE ROSE STYLE)
+# 🔒 LOCK SYSTEM (ULTIMATE ROSE STYLE & FULL POWER)
 # ============================================================
 
-from pyrogram import Client, filters
-from pyrogram.types import Message
-from pyrogram.errors import ChatAdminRequired
+from pyrogram import filters
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from pyrogram.enums import ChatMemberStatus
 import re
 
-from database import set_lock, get_locks
-
 # ============================================================
-# 🔐 AVAILABLE LOCKS
+# 🔐 AVAILABLE LOCKS (ROSE STYLE COMPREHENSIVE LIST)
 # ============================================================
 
 LOCK_TYPES = [
     "all", "media", "photo", "video", "audio", "voice",
-    "document", "sticker", "gif",
-    "link", "forward", "bots",
-    "inline", "game", "location",
-    "contact", "poll", "service",
-    "text", "url", "hashtag"
+    "document", "sticker", "gif", "animation",
+    "link", "url", "forward", "bots", "bot",
+    "inline", "game", "location", "contact",
+    "poll", "service", "text", "hashtag", "audio"
 ]
 
-# ============================================================
-# 🔧 ADMIN CHECK
-# ============================================================
+def register_lock_system(app, db):
 
-async def is_admin(client, chat_id, user_id):
-    member = await client.get_chat_member(chat_id, user_id)
-    return member.status in ["administrator", "creator"]
+    # ============================================================
+    # 🔧 ADMIN CHECK (ROSE STYLE ROBUST)
+    # ============================================================
+    async def is_admin(client, chat_id, user_id):
+        if not user_id:
+            return False
+        try:
+            member = await client.get_chat_member(chat_id, user_id)
+            return member.status in [
+                ChatMemberStatus.ADMINISTRATOR,
+                ChatMemberStatus.OWNER
+            ]
+        except:
+            return False
 
-# ============================================================
-# 🔒 LOCK COMMAND
-# ============================================================
+    # ============================================================
+    # 🗄️ DB FUNCTIONS
+    # ============================================================
+    async def set_lock(chat_id: int, lock_type: str, status: bool):
+        await db.locks.update_one(
+            {"chat_id": chat_id},
+            {"$set": {lock_type: status}},
+            upsert=True
+        )
 
-@Client.on_message(filters.command("lock") & filters.group)
-async def lock_cmd(client: Client, message: Message):
-    if len(message.command) < 2:
-        return await message.reply_text(f"❌ Usage: /lock <type>")
+    async def get_locks(chat_id: int) -> dict:
+        data = await db.locks.find_one({"chat_id": chat_id})
+        return data if data else {}
 
-    if not await is_admin(client, message.chat.id, message.from_user.id):
-        return await message.reply_text("❌ Admin only")
+    # ============================================================
+    # 🔒 LOCK COMMAND
+    # ============================================================
+    @app.on_message(filters.command("lock") & filters.group)
+    async def lock_cmd(client, message: Message):
+        if not await is_admin(client, message.chat.id, message.from_user.id):
+            return await message.reply_text("❌ **Only admins can use this command!**")
 
-    lock_type = message.command[1].lower()
+        if len(message.command) < 2:
+            return await message.reply_text(
+                "❌ **Incorrect usage!**\n"
+                "• Usage: `/lock <type>`\n"
+                "• Example: `/lock link` or `/lock sticker`"
+            )
 
-    if lock_type not in LOCK_TYPES:
-        return await message.reply_text(f"❌ Invalid lock type")
+        lock_type = message.command[1].lower()
 
-    await set_lock(message.chat.id, lock_type, True)
-    await message.reply_text(f"🔒 **Locked:** {lock_type}")
+        if lock_type not in LOCK_TYPES:
+            return await message.reply_text(
+                f"❌ **Invalid lock type:** `{lock_type}`\n"
+                f"Use `/locks` to view all available lock types."
+            )
 
-# ============================================================
-# 🔓 UNLOCK COMMAND
-# ============================================================
+        await set_lock(message.chat.id, lock_type, True)
+        await message.reply_text(f"🔒 **Locked Successfully:** `{lock_type}` 🟢")
 
-@Client.on_message(filters.command("unlock") & filters.group)
-async def unlock_cmd(client: Client, message: Message):
-    if len(message.command) < 2:
-        return await message.reply_text(f"❌ Usage: /unlock <type>")
+    # ============================================================
+    # 🔓 UNLOCK COMMAND
+    # ============================================================
+    @app.on_message(filters.command("unlock") & filters.group)
+    async def unlock_cmd(client, message: Message):
+        if not await is_admin(client, message.chat.id, message.from_user.id):
+            return await message.reply_text("❌ **Only admins can use this command!**")
 
-    if not await is_admin(client, message.chat.id, message.from_user.id):
-        return await message.reply_text("❌ Admin only")
+        if len(message.command) < 2:
+            return await message.reply_text(
+                "❌ **Incorrect usage!**\n"
+                "• Usage: `/unlock <type>`\n"
+                "• Example: `/unlock link`"
+            )
 
-    lock_type = message.command[1].lower()
+        lock_type = message.command[1].lower()
 
-    if lock_type not in LOCK_TYPES:
-        return await message.reply_text("❌ Invalid lock")
+        if lock_type not in LOCK_TYPES:
+            return await message.reply_text(f"❌ **Invalid lock type:** `{lock_type}`")
 
-    await set_lock(message.chat.id, lock_type, False)
-    await message.reply_text(f"🔓 **Unlocked:** {lock_type}")
+        await set_lock(message.chat.id, lock_type, False)
+        await message.reply_text(f"🔓 **Unlocked Successfully:** `{lock_type}` 🔴")
 
-# ============================================================
-# 📊 LOCK STATUS
-# ============================================================
+    # ============================================================
+    # 📊 LOCK STATUS PANEL (ROSE STYLE)
+    # ============================================================
+    @app.on_message(filters.command("locks") & filters.group)
+    async def locks_status(client, message: Message):
+        data = await get_locks(message.chat.id)
 
-@Client.on_message(filters.command("locks") & filters.group)
-async def locks_status(client: Client, message: Message):
-    data = await get_locks(message.chat.id)
+        text = "🔒 **Current Group Locks Status:**\n\n"
+        
+        # Display main structured locks
+        main_locks = ["all", "media", "photo", "video", "sticker", "link", "forward", "bots", "text", "poll", "game", "inline"]
+        
+        for lock in main_locks:
+            status = "🔒 Locked" if data.get(lock) else "🔓 Unlocked"
+            icon = "🔴" if data.get(lock) else "🟢"
+            text.format()
+            text += f"• **{lock.capitalize()}**: {status} {icon}\n"
 
-    text = "🔒 **Lock Status:**\n\n"
+        text += "\n_Use `/lock <type>` or `/unlock <type>` to change settings._"
 
-    for lock in LOCK_TYPES:
-        status = "✅" if data.get(lock) else "❌"
-        text += f"• {lock}: {status}\n"
+        await message.reply_text(text)
 
-    await message.reply_text(text)
+    # ============================================================
+    # 🚫 LINK & TEXT PATTERN DETECTION
+    # ============================================================
+    LINK_REGEX = re.compile(r"(https?://|t\.me/|www\.|[a-zA-Z0-9][-a-zA-Z0-90-9]*\.[a-zA-Z]{2,}(/.*)?)")
 
-# ============================================================
-# 🚫 LINK DETECTION
-# ============================================================
+    def has_link(text):
+        return bool(text and LINK_REGEX.search(text))
 
-LINK_REGEX = re.compile(r"(https?://|t\.me/|www\.)")
+    # ============================================================
+    # 🚨 ULTIMATE LOCK AUTO-FILTER (POWERFUL ENGINE)
+    # ============================================================
+    @app.on_message(filters.group & ~filters.service, group=5)
+    async def lock_filter(client, message: Message):
+        if not message.from_user:
+            return
 
-def has_link(text):
-    return bool(text and LINK_REGEX.search(text))
-
-# ============================================================
-# 🚨 MAIN FILTER (AUTO DELETE)
-# ============================================================
-
-@Client.on_message(filters.group & ~filters.service)
-async def lock_filter(client: Client, message: Message):
-
-    # skip admins
-    if message.from_user:
+        # Skip check for group admins
         if await is_admin(client, message.chat.id, message.from_user.id):
             return
 
-    locks = await get_locks(message.chat.id)
+        locks = await get_locks(message.chat.id)
+        if not locks:
+            return
 
-    delete = False
+        should_delete = False
 
-    # GLOBAL LOCK
-    if locks.get("all"):
-        delete = True
+        # 1. GLOBAL LOCK (ALL)
+        if locks.get("all"):
+            should_delete = True
 
-    # MEDIA
-    if locks.get("media") and message.media:
-        delete = True
+        # 2. MEDIA LOCKS
+        elif locks.get("media") and message.media:
+            should_delete = True
+        elif locks.get("photo") and message.photo:
+            should_delete = True
+        elif locks.get("video") and message.video:
+            should_delete = True
+        elif locks.get("audio") and message.audio:
+            should_delete = True
+        elif locks.get("voice") and message.voice:
+            should_delete = True
+        elif locks.get("document") and message.document:
+            should_delete = True
+        elif locks.get("sticker") and message.sticker:
+            should_delete = True
+        elif (locks.get("gif") or locks.get("animation")) and message.animation:
+            should_delete = True
 
-    if locks.get("photo") and message.photo:
-        delete = True
+        # 3. TEXT & LINK LOCKS
+        elif locks.get("text") and message.text:
+            should_delete = True
+        elif (locks.get("link") or locks.get("url")) and (has_link(message.text) or has_link(message.caption)):
+            should_delete = True
+        elif locks.get("hashtag") and message.text and "#" in message.text:
+            should_delete = True
 
-    if locks.get("video") and message.video:
-        delete = True
+        # 4. FORWARD & BOTS LOCKS
+        elif locks.get("forward") and message.forward_date:
+            should_delete = True
+        elif (locks.get("bots") or locks.get("bot")) and message.from_user.is_bot:
+            should_delete = True
+        elif locks.get("inline") and message.via_bot:
+            should_delete = True
 
-    if locks.get("audio") and message.audio:
-        delete = True
+        # 5. MISC LOCKS (POLL, GAME, LOCATION, CONTACT)
+        elif locks.get("contact") and message.contact:
+            should_delete = True
+        elif locks.get("location") and message.location:
+            should_delete = True
+        elif locks.get("poll") and message.poll:
+            should_delete = True
+        elif locks.get("game") and message.game:
+            should_delete = True
 
-    if locks.get("voice") and message.voice:
-        delete = True
-
-    if locks.get("document") and message.document:
-        delete = True
-
-    if locks.get("sticker") and message.sticker:
-        delete = True
-
-    if locks.get("gif") and message.animation:
-        delete = True
-
-    # TEXT
-    if locks.get("text") and message.text:
-        delete = True
-
-    # LINKS
-    if locks.get("link") and (has_link(message.text) or has_link(message.caption)):
-        delete = True
-
-    # FORWARD
-    if locks.get("forward") and message.forward_date:
-        delete = True
-
-    # BOT
-    if locks.get("bots") and message.from_user and message.from_user.is_bot:
-        delete = True
-
-    # HASHTAG
-    if locks.get("hashtag") and message.text and "#" in message.text:
-        delete = True
-
-    # CONTACT
-    if locks.get("contact") and message.contact:
-        delete = True
-
-    # LOCATION
-    if locks.get("location") and message.location:
-        delete = True
-
-    # POLL
-    if locks.get("poll") and message.poll:
-        delete = True
-
-    # GAME
-    if locks.get("game") and message.game:
-        delete = True
-
-    # INLINE
-    if locks.get("inline") and message.via_bot:
-        delete = True
-
-    # ========================================================
-    # 🚫 DELETE ACTION
-    # ========================================================
-
-    if delete:
-        try:
-            await message.delete()
-        except:
-            pass
+        # ========================================================
+        # 🗑️ EXECUTE DELETION
+        # ========================================================
+        if should_delete:
+            try:
+                await message.delete()
+            except Exception:
+                pass
