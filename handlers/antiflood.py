@@ -8,7 +8,8 @@ from collections import defaultdict, deque
 from pyrogram import filters
 from pyrogram.types import Message, ChatPermissions
 
-from database import db
+# Project ke centralized db structure ke sath sync kiya gaya hai
+from db import db
 
 # =========================
 # ⚙️ DEFAULT SETTINGS
@@ -40,9 +41,10 @@ async def get_settings(chat_id):
     data = await settings_collection.find_one({"chat_id": chat_id})
 
     if not data:
-        DEFAULT["chat_id"] = chat_id
-        await settings_collection.insert_one(DEFAULT)
-        return DEFAULT
+        default_data = DEFAULT.copy()
+        default_data["chat_id"] = chat_id
+        await settings_collection.insert_one(default_data)
+        return default_data
 
     return data
 
@@ -56,7 +58,7 @@ async def is_protected(client, chat_id, user_id):
         if member.status in ["administrator", "creator"]:
             return True
 
-        wl = await whitelist_db.find_one({"user_id": user_id})
+        wl = await whitelist_db.find_one({"user_id": user_id, "chat_id": chat_id})
         return bool(wl)
 
     except:
@@ -68,7 +70,7 @@ async def is_protected(client, chat_id, user_id):
 async def is_flood(user_id, chat_id):
     settings = await get_settings(chat_id)
 
-    if not settings["enabled"]:
+    if not settings.get("enabled", True):
         return False
 
     now = time.time()
@@ -76,10 +78,13 @@ async def is_flood(user_id, chat_id):
 
     dq.append(now)
 
-    while dq and now - dq[0] > settings["window"]:
+    window = settings.get("window", 5)
+    limit = settings.get("limit", 6)
+
+    while dq and now - dq[0] > window:
         dq.popleft()
 
-    return len(dq) > settings["limit"]
+    return len(dq) > limit
 
 # =========================
 # ⚔️ ACTION SYSTEM
@@ -98,11 +103,12 @@ async def take_action(client, message, settings):
         upsert=True
     )
 
-    action = settings["action"]
+    action = settings.get("action", "mute")
 
     try:
         if action == "mute":
-            duration = settings["mute"] * count
+            mute_time = settings.get("mute", 60)
+            duration = mute_time * count
 
             await message.chat.restrict_member(
                 user_id,
@@ -117,12 +123,12 @@ async def take_action(client, message, settings):
         elif action == "ban":
             await message.chat.ban_member(user_id)
 
-        if not settings["silent"]:
+        if not settings.get("silent", False):
             await message.reply_text(
-                f"🚫 Flood Detected!\n"
+                f"🚫 **Flood Detected!**\n"
                 f"👤 {message.from_user.mention}\n"
-                f"⚠️ Warn: {count}\n"
-                f"⚔️ Action: {action.upper()}"
+                f"⚠️ Warn: `{count}`\n"
+                f"⚔️ Action: `{action.upper()}`"
             )
 
     except Exception as e:
@@ -139,13 +145,13 @@ async def save_log(chat_id, user_id):
     })
 
 # =========================
-# 🔥 HANDLER
+# 🔥 HANDLER & COMMANDS REGISTRATION
 # =========================
 def register_antiflood(app):
 
-    @app.on_message(filters.group & ~filters.bot)
-    async def handler(client, message: Message):
-
+    # 1. Message Monitor (AntiFlood Check)
+    @app.on_message(filters.group & ~filters.bot & ~filters.via_bot, group=2)
+    async def antiflood_handler(client, message: Message):
         if not message.from_user:
             return
 
@@ -157,11 +163,10 @@ def register_antiflood(app):
             return
 
         if await is_flood(user_id, chat_id):
-
             settings = await get_settings(chat_id)
 
             # delete message
-            if settings["delete"]:
+            if settings.get("delete", True):
                 try:
                     await message.delete()
                 except:
@@ -172,25 +177,21 @@ def register_antiflood(app):
 
             user_cache[(chat_id, user_id)].clear()
 
-# =========================
-# ⚙️ COMMANDS
-# =========================
-def register_antiflood_commands(app):
-
-    # TOGGLE
+    # 2. Toggle Command (/antiflood)
     @app.on_message(filters.command("antiflood") & filters.group)
     async def toggle(client, message: Message):
         data = await get_settings(message.chat.id)
-        new = not data["enabled"]
+        new = not data.get("enabled", True)
 
         await settings_collection.update_one(
             {"chat_id": message.chat.id},
-            {"$set": {"enabled": new}}
+            {"$set": {"enabled": new}},
+            upsert=True
         )
 
         await message.reply_text(f"⚙️ AntiFlood {'ON 🟢' if new else 'OFF 🔴'}")
 
-    # SET LIMIT
+    # 3. Set Limit Command (/setflood)
     @app.on_message(filters.command("setflood") & filters.group)
     async def set_flood(client, message: Message):
         try:
@@ -202,18 +203,19 @@ def register_antiflood_commands(app):
                 upsert=True
             )
 
-            await message.reply_text(f"✅ Limit: {l} | Window: {w}s")
+            await message.reply_text(f"✅ AntiFlood Limit updated: `{l}` messages in `{w}s`")
         except:
-            await message.reply_text("❌ Usage: /setflood 6 5")
+            await message.reply_text("❌ **Usage:** `/setflood <limit> <window_seconds>`\n*Example:* `/setflood 6 5`")
 
-    # SET ACTION
+    # 4. Set Action Command (/setaction)
     @app.on_message(filters.command("setaction") & filters.group)
     async def set_action(client, message: Message):
         try:
             _, action = message.text.split()
+            action = action.lower()
 
             if action not in ["mute", "kick", "ban"]:
-                return await message.reply_text("❌ mute/kick/ban only")
+                return await message.reply_text("❌ Allowed actions: `mute`, `kick`, `ban`")
 
             await settings_collection.update_one(
                 {"chat_id": message.chat.id},
@@ -221,12 +223,12 @@ def register_antiflood_commands(app):
                 upsert=True
             )
 
-            await message.reply_text(f"⚔️ Action set: {action}")
+            await message.reply_text(f"⚔️ AntiFlood action set to: `{action.upper()}`")
         except:
-            await message.reply_text("❌ Usage: /setaction mute")
+            await message.reply_text("❌ **Usage:** `/setaction <mute/kick/ban>`")
 
-    # STATS
+    # 5. Stats Command (/floodstats)
     @app.on_message(filters.command("floodstats") & filters.group)
     async def stats(client, message: Message):
         count = await flood_logs.count_documents({"chat_id": message.chat.id})
-        await message.reply_text(f"📊 Total Flood Cases: {count}")
+        await message.reply_text(f"📊 Total Flood Cases Handled: `{count}`")
