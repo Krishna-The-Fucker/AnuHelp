@@ -21,7 +21,9 @@ import logging
 import imageio
 from pyrogram import filters
 from pyrogram.types import Message, ChatPermissions
-from database import db
+
+# Project ke centralized db structure ke sath sync kiya gaya hai
+from db import db
 from nudenet import NudeClassifier
 
 # ============================================================
@@ -45,7 +47,7 @@ def get_classifier():
     return _classifier
 
 # ============================================================
-# 🗄️ DATABASE
+# 🗄️ DATABASE COLLECTIONS
 # ============================================================
 
 settings_db = db.antiporn_settings
@@ -189,12 +191,12 @@ async def take_action(message, settings):
 🚫 **NSFW Content Detected!**
 
 👤 {message.from_user.mention}
-⚠️ Warn: {count}/{settings['warn_limit']}
+⚠️ Warn: `{count}/{settings['warn_limit']}`
 """
     )
 
 # ============================================================
-# 🚫 MAIN HANDLER
+# 🔥 HANDLER & COMMANDS REGISTRATION
 # ============================================================
 
 def register_antiporn_system(app):
@@ -202,15 +204,14 @@ def register_antiporn_system(app):
     # -------------------------
     # 📥 MEDIA CHECK HANDLER
     # -------------------------
-    @app.on_message(filters.group & ~filters.bot)
-    async def handler(client, message: Message):
-
+    @app.on_message(filters.group & ~filters.bot & ~filters.via_bot, group=5)
+    async def antiporn_handler(client, message: Message):
         if not message.from_user:
             return
 
         settings = await get_settings(message.chat.id)
 
-        if not settings["enabled"]:
+        if not settings.get("enabled", True):
             return
 
         # 🛡️ Skip Admins
@@ -266,15 +267,16 @@ def register_antiporn_system(app):
     @app.on_message(filters.command("antiporn") & filters.group)
     async def toggle_antiporn(client, message: Message):
         data = await get_settings(message.chat.id)
-        new = not data["enabled"]
+        new = not data.get("enabled", True)
 
         await settings_db.update_one(
             {"chat_id": message.chat.id},
-            {"$set": {"enabled": new}}
+            {"$set": {"enabled": new}},
+            upsert=True
         )
 
         await message.reply_text(
-            f"🛡️ Anti-NSFW {'Enabled' if new else 'Disabled'}"
+            f"🛡️ Anti-NSFW {'Enabled 🟢' if new else 'Disabled 🔴'}"
         )
 
     # -------------------------
@@ -288,8 +290,8 @@ def register_antiporn_system(app):
             f"""
 🛡️ **Anti-NSFW Status**
 
-• Enabled: {data['enabled']}
-• Warn Limit: {data['warn_limit']}
-• Action: {data['action']}
+• Enabled: `{data.get('enabled', True)}`
+• Warn Limit: `{data.get('warn_limit', 3)}`
+• Action: `{data.get('action', 'mute')}`
 """
         )
