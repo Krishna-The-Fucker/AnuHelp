@@ -2,161 +2,172 @@
 # 🤖 CAPTCHA SYSTEM (FINAL PRO MAX - FIXED + OPTIMIZED)
 # ============================================================
 
-from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ChatPermissions
+__mod_name__ = "🤖 ᴄᴀᴘᴛᴄʜᴀ"
+
+__help__ = """
+*🤖 ᴄᴀᴘᴛᴄʜᴀ sʏsᴛᴇᴍ* — Protect your group from bot raids and spam by requiring new users to solve a quick captcha!
+
+• `/captcha` — Check or toggle captcha settings
+"""
+
+from pyrogram import filters
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ChatPermissions, Message, CallbackQuery
 import asyncio
 import random
 import string
+import logging
 
-from config import OWNER_ID, DEV_LIST, IGNORE_DEVS
-from database import db
+def register_captcha_system(app, db, OWNER_ID, DEV_LIST, IGNORE_DEVS):
 
-# ============================================================
-# ⚙️ SETTINGS
-# ============================================================
+    CAPTCHA_TIMEOUT = 60  # seconds
 
-CAPTCHA_TIMEOUT = 60  # seconds
+    # ============================================================
+    # 🧠 GENERATE CAPTCHA
+    # ============================================================
+    def generate_captcha():
+        return ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
 
-# ============================================================
-# 🧠 GENERATE CAPTCHA
-# ============================================================
+    # ============================================================
+    # 🚫 NEW USER JOIN WATCHER
+    # ============================================================
+    @app.on_message(filters.new_chat_members, group=3)
+    async def captcha_join(client, message: Message):
+        chat_id = message.chat.id
 
-def generate_captcha():
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+        for user in message.new_chat_members:
+            if user.is_bot:
+                continue
 
+            if user.id == OWNER_ID or (IGNORE_DEVS and user.id in DEV_LIST):
+                continue
 
-# ============================================================
-# 🚫 NEW USER JOIN
-# ============================================================
+            # Check if already exists (anti-duplicate)
+            existing = await db.captcha.find_one({
+                "chat_id": chat_id,
+                "user_id": user.id
+            })
 
-@Client.on_message(filters.new_chat_members)
-async def captcha_join(client, message):
-    chat_id = message.chat.id
+            if existing and not existing.get("verified"):
+                continue
 
-    for user in message.new_chat_members:
+            captcha_text = generate_captcha()
 
-        if user.is_bot:
-            continue
-
-        if user.id == OWNER_ID or (IGNORE_DEVS and user.id in DEV_LIST):
-            continue
-
-        # Check if already exists (anti-duplicate)
-        existing = await db.captcha.find_one({
-            "chat_id": chat_id,
-            "user_id": user.id
-        })
-
-        if existing and not existing.get("verified"):
-            continue
-
-        captcha_text = generate_captcha()
-
-        # Restrict user (full mute)
-        await client.restrict_chat_member(
-            chat_id,
-            user.id,
-            ChatPermissions()
-        )
-
-        # Save in DB
-        await db.captcha.update_one(
-            {"chat_id": chat_id, "user_id": user.id},
-            {"$set": {
-                "captcha": captcha_text,
-                "verified": False
-            }},
-            upsert=True
-        )
-
-        msg = await message.reply(
-            f"🔐 Welcome {user.mention}\n\n"
-            f"👉 Verify yourself!\n"
-            f"Captcha: `{captcha_text}`\n\n"
-            f"Click button below 👇",
-            reply_markup=InlineKeyboardMarkup(
-                [[InlineKeyboardButton("✅ Verify", callback_data=f"verify_{user.id}")]]
-            )
-        )
-
-        # Timeout system
-        await asyncio.sleep(CAPTCHA_TIMEOUT)
-
-        data = await db.captcha.find_one({"chat_id": chat_id, "user_id": user.id})
-
-        if data and not data.get("verified"):
             try:
-                await client.ban_chat_member(chat_id, user.id)
-                await msg.edit(f"❌ {user.mention} failed captcha → kicked!")
-            except:
-                pass
+                # Restrict user (full mute)
+                await client.restrict_chat_member(
+                    chat_id,
+                    user.id,
+                    ChatPermissions(can_send_messages=False)
+                )
+            except Exception as e:
+                logging.error(f"[Captcha Restriction Error]: {e}")
+                continue
 
-
-# ============================================================
-# ✅ VERIFY BUTTON
-# ============================================================
-
-@Client.on_callback_query(filters.regex("^verify_"))
-async def verify_captcha(client, callback):
-    user_id = int(callback.data.split("_")[1])
-    chat_id = callback.message.chat.id
-
-    if callback.from_user.id != user_id:
-        return await callback.answer("❌ Not your captcha!", show_alert=True)
-
-    data = await db.captcha.find_one({"chat_id": chat_id, "user_id": user_id})
-
-    if not data:
-        return await callback.answer("❌ Expired captcha!", show_alert=True)
-
-    await callback.message.reply("✍️ Send captcha text to verify")
-    await callback.answer()
-
-
-# ============================================================
-# ✍️ TEXT VERIFY
-# ============================================================
-
-@Client.on_message(filters.text & filters.group)
-async def check_captcha(client, message):
-    chat_id = message.chat.id
-    user_id = message.from_user.id
-
-    data = await db.captcha.find_one({"chat_id": chat_id, "user_id": user_id})
-
-    if not data or data.get("verified"):
-        return
-
-    if message.text.strip().upper() == data.get("captcha"):
-
-        # Mark verified
-        await db.captcha.update_one(
-            {"chat_id": chat_id, "user_id": user_id},
-            {"$set": {"verified": True}}
-        )
-
-        # Unmute user
-        await client.restrict_chat_member(
-            chat_id,
-            user_id,
-            ChatPermissions(
-                can_send_messages=True,
-                can_send_media_messages=True,
-                can_send_other_messages=True,
-                can_add_web_page_previews=True
+            # Save in DB
+            await db.captcha.update_one(
+                {"chat_id": chat_id, "user_id": user.id},
+                {"$set": {
+                    "captcha": captcha_text,
+                    "verified": False
+                }},
+                upsert=True
             )
-        )
 
-        await message.reply("✅ Verified successfully!")
+            try:
+                msg = await message.reply(
+                    f"🔐 **Welcome** {user.mention}!\n\n"
+                    f"👉 **Please verify yourself to chat!**\n"
+                    f"• **Captcha Code:** `{captcha_text}`\n\n"
+                    f"_Click the button below and type this code in chat._",
+                    reply_markup=InlineKeyboardMarkup(
+                        [[InlineKeyboardButton("✅ Verify Now", callback_data=f"verify_{user.id}")]]
+                    )
+                )
+            except Exception:
+                continue
 
-    else:
-        await message.reply("❌ Wrong captcha!")
+            # Timeout system background task
+            async def timeout_watcher():
+                await asyncio.sleep(CAPTCHA_TIMEOUT)
+                data = await db.captcha.find_one({"chat_id": chat_id, "user_id": user.id})
 
+                if data and not data.get("verified"):
+                    try:
+                        await client.ban_chat_member(chat_id, user.id)
+                        await client.unban_chat_member(chat_id, user.id) # Kick pattern
+                        await msg.edit(f"❌ {user.mention} failed to verify within time → **Kicked!**")
+                    except Exception:
+                        pass
 
-# ============================================================
-# 🔌 REGISTER FUNCTION (IMPORTANT)
-# ============================================================
+            try:
+                app.loop.create_task(timeout_watcher())
+            except Exception:
+                asyncio.create_task(timeout_watcher())
 
-def register_captcha(app):
-    # decorators already handle everything
-    pass
+    # ============================================================
+    # ✅ VERIFY BUTTON HANDLER
+    # ============================================================
+    @app.on_callback_query(filters.regex("^verify_"))
+    async def verify_captcha(client, callback: CallbackQuery):
+        try:
+            user_id = int(callback.data.split("_")[1])
+            chat_id = callback.message.chat.id
+
+            if callback.from_user.id != user_id:
+                return await callback.answer("❌ This verification button is not for you!", show_alert=True)
+
+            data = await db.captcha.find_one({"chat_id": chat_id, "user_id": user_id})
+
+            if not data or data.get("verified"):
+                return await callback.answer("❌ Captcha already verified or expired!", show_alert=True)
+
+            await callback.message.reply(
+                f"✍️ **{callback.from_user.mention}, please send the exact captcha code (`{data.get('captcha')}`) in this chat to verify.**"
+            )
+            await callback.answer("Check message instructions!", show_alert=False)
+        except Exception as e:
+            logging.error(f"[Captcha Callback Error]: {e}")
+
+    # ============================================================
+    # ✍️ TEXT VERIFICATION HANDLER
+    # ============================================================
+    @app.on_message(filters.text & filters.group, group=4)
+    async def check_captcha(client, message: Message):
+        if not message.from_user:
+            return
+
+        chat_id = message.chat.id
+        user_id = message.from_user.id
+
+        data = await db.captcha.find_one({"chat_id": chat_id, "user_id": user_id})
+
+        if not data or data.get("verified"):
+            return
+
+        if message.text.strip().upper() == data.get("captcha"):
+            # Mark verified
+            await db.captcha.update_one(
+                {"chat_id": chat_id, "user_id": user_id},
+                {"$set": {"verified": True}}
+            )
+
+            try:
+                # Unmute user fully
+                await client.restrict_chat_member(
+                    chat_id,
+                    user_id,
+                    ChatPermissions(
+                        can_send_messages=True,
+                        can_send_media_messages=True,
+                        can_send_polls=True,
+                        can_send_other_messages=True,
+                        can_add_web_page_previews=True,
+                        can_invite_users=True
+                    )
+                )
+                await message.reply(f"✅ **Verification Successful!** Welcome to the group, {message.from_user.mention} 🎉")
+            except Exception as e:
+                logging.error(f"[Captcha Unmute Error]: {e}")
+        else:
+            # Wrong text entered, delete or notify optionally to prevent clutter
+            pass
