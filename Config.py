@@ -157,6 +157,52 @@ IGNORE_COMMANDS_IN_TRANSLATE = os.getenv(
 ) == "True"
 
 # ============================================================
+# 👋 WELCOME SYSTEM CONFIGS
+# ============================================================
+
+WELCOME_DEFAULT_MODE = os.getenv("WELCOME_DEFAULT_MODE", "text") # text/media
+WELCOME_CLEAN_SERVICE = os.getenv("WELCOME_CLEAN_SERVICE", "True") == "True"
+
+# ============================================================
+# 📝 ANI-QUOTE SYSTEM CONFIGS
+# ============================================================
+
+ANIQUOTE_DEFAULT_LIMIT = int(os.getenv("ANIQUOTE_DEFAULT_LIMIT", "5"))
+
+# ============================================================
+# 🚫 ANTI-EDIT SYSTEM CONFIGS
+# ============================================================
+
+ANTI_EDIT_DEFAULT = os.getenv("ANTI_EDIT_DEFAULT", "False") == "True"
+ANTI_EDIT_ALERT_TIMEOUT = int(os.getenv("ANTI_EDIT_ALERT_TIMEOUT", "4"))
+
+# ============================================================
+# 🌐 FEDERATION SYSTEM CONFIGS
+# ============================================================
+
+FEDERATION_ENABLED = os.getenv("FEDERATION_ENABLED", "True") == "True"
+MAX_FEDS_PER_USER = int(os.getenv("MAX_FEDS_PER_USER", "1"))
+
+# ============================================================
+# 🚫 BLACKLIST SYSTEM CONFIGS (CHATS & USERS)
+# ============================================================
+
+AUTO_LEAVE_BLACKLIST_CHATS = os.getenv("AUTO_LEAVE_BLACKLIST_CHATS", "True") == "True"
+BLOCK_BLACKLIST_USERS = os.getenv("BLOCK_BLACKLIST_USERS", "True") == "True"
+
+# ============================================================
+# 🧶 STRING GENERATOR SYSTEM CONFIGS
+# ============================================================
+
+STRING_GEN_TIMEOUT = int(os.getenv("STRING_GEN_TIMEOUT", "300"))
+
+# ============================================================
+# 🎮 QUICK GAMES SYSTEM CONFIGS
+# ============================================================
+
+GAMES_ENABLED = os.getenv("GAMES_ENABLED", "True") == "True"
+
+# ============================================================
 # 🧠 SECURITY FLAGS
 # ============================================================
 
@@ -187,4 +233,4 @@ if not API_ID or not API_HASH or not BOT_TOKEN:
 if not MONGO_URI:
     raise ValueError("❌ MONGO_URI required!")
 
-print("✅ CONFIG LOADED SUCCESSFULLY 🚀")
+print("✅ CONFIG LOADED SUCCESSFULLY (COMPLETE WITH ALL MODULE PARAMETERS) 🚀")
