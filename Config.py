@@ -8,12 +8,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ============================================================
-# 🔑 BOT CREDENTIALS
+# 🔑 BOT CREDENTIALS & APIs
 # ============================================================
 
 API_ID = int(os.getenv("API_ID", "0"))
 API_HASH = os.getenv("API_HASH", "")
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
 # ============================================================
 # 🗄️ DATABASE
@@ -41,11 +42,12 @@ IGNORE_DEVS = os.getenv("IGNORE_DEVS", "True") == "True"
 IGNORE_SUDO = os.getenv("IGNORE_SUDO", "True") == "True"
 
 # ============================================================
-# 📢 CHANNEL / LOGS
+# 📢 CHANNEL / LOGS & STARTUP MEDIA
 # ============================================================
 
 SUPPORT_CHAT = int(os.getenv("SUPPORT_CHAT", "0"))
 LOG_CHANNEL = int(os.getenv("LOG_CHANNEL", "0"))
+START_VIDEO_URL = os.getenv("START_VIDEO_URL", "https://envs.sh/q3z.mp4")
 
 # ============================================================
 # ⚠️ WARN SYSTEM
