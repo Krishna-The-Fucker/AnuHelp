@@ -1,6 +1,7 @@
 # ============================================================
-# 🤖 CORE TELEGRAM BOT
+# 🤖 CORE TELEGRAM BOT REQUIREMENTS (ULTIMATE PRO MAX)
 # ============================================================
+
 pyrogram==2.0.106
 tgcrypto==1.2.5
 motor==3.1.1
@@ -18,3 +19,7 @@ googletrans==4.0.0-rc1
 dnspython>=2.4.2
 aiohttp>=3.9.1
 certifi>=2023.11.17
+
+# --- 📦 ADDED FOR NEW MODULES (Telegraph & Zip & AI/Async support) ---
+telegraph>=2.2.0
+requests>=2.31.0
