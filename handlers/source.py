@@ -18,7 +18,7 @@ def register_source_system(app):
     @app.on_message(filters.command("source"))
     async def source_code_cmd(client, message: Message):
         source_text = (
-            f"📂 **NOMAD TELEGRAM MANAGEMENT BOT**\n\n"
+            f"📂 **ᴀɴᴜ x ʜᴇʟᴩ ᴛᴇʟᴇɢᴀʀᴍ ᴍᴀɴɢᴇᴍᴇɴᴛ & ꜰᴜʟʟʏ ᴩᴀᴡᴏʀ ꜰᴜʟʟ ᴀʟʟ ɪɴ ᴏɴᴇ ʙᴏᴛ**\n\n"
             f"• **Architecture:** Asynchronous Modular Design\n"
             f"• **Core Framework:** Pyrogram (MTProto API)\n"
             f"• **Database:** MongoDB (Motor Async)\n"
