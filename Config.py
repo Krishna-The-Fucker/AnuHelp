@@ -16,6 +16,9 @@ API_HASH = os.getenv("API_HASH", "")
 BOT_TOKEN = os.getenv("BOT_TOKEN", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
+# --- 🤖 ADDED FOR DEEP AI INTEGRATION ---
+DEEP_AI_API_KEY = os.getenv("DEEP_AI_API_KEY", "")
+
 # ============================================================
 # 🗄️ DATABASE
 # ============================================================
