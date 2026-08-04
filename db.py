@@ -54,7 +54,8 @@ DEFAULT = {
     "antibiolink": False,
     "captcha": True,
     "night_mode": False,
-    "broadcast": True
+    "broadcast": True,
+    "chatbot": False
 }
 
 
@@ -183,6 +184,28 @@ async def get_antibiolink(chat_id):
     status = data.get("enabled", DEFAULT["antibiolink"]) if data else DEFAULT["antibiolink"]
 
     cache_set(f"antibiolink:{chat_id}", status)
+    return status
+
+# ==========================================================
+# 🤖 CHATBOT SYSTEM TOGGLE
+# ==========================================================
+
+async def set_chatbot(chat_id, status):
+    await db.ai_toggles.update_one(
+        {"chat_id": chat_id},
+        {"$set": {"enabled": status, "updated": datetime.utcnow()}},
+        upsert=True
+    )
+    cache_set(f"chatbot:{chat_id}", status)
+
+async def get_chatbot(chat_id):
+    if (cached := cache_get(f"chatbot:{chat_id}")) is not None:
+        return cached
+
+    data = await db.ai_toggles.find_one({"chat_id": chat_id})
+    status = data.get("enabled", DEFAULT["chatbot"]) if data else DEFAULT["chatbot"]
+
+    cache_set(f"chatbot:{chat_id}", status)
     return status
 
 # ==========================================================
@@ -378,5 +401,7 @@ async def create_indexes():
     await db.language.create_index("chat_id", unique=True)
     
     await db.settings.create_index("chat_id", unique=True)
+    
+    await db.ai_toggles.create_index("chat_id", unique=True)
 
     logger.info("✅ Database Indexes Created")
