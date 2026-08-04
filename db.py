@@ -355,20 +355,27 @@ async def get_antiedit(chat_id):
     return data.get("enabled", DEFAULT["antiedit"]) if data else DEFAULT["antiedit"]
 
 # ==========================================================
-# 👋 WELCOME SYSTEM
+# 👋 WELCOME SYSTEM (EXTENDED SUPPORT)
 # ==========================================================
 
 async def set_welcome(chat_id, status):
-    await db.welcome.update_one(
+    await db.welcome_toggles.update_one(
         {"chat_id": chat_id},
         {"$set": {"enabled": status}},
         upsert=True
     )
+    cache_set(f"welcome_toggle:{chat_id}", status)
 
 
 async def get_welcome(chat_id):
-    data = await db.welcome.find_one({"chat_id": chat_id})
-    return data.get("enabled", DEFAULT["welcome"]) if data else DEFAULT["welcome"]
+    if (cached := cache_get(f"welcome_toggle:{chat_id}")) is not None:
+        return cached
+
+    data = await db.welcome_toggles.find_one({"chat_id": chat_id})
+    status = data.get("enabled", DEFAULT["welcome"]) if data else DEFAULT["welcome"]
+    
+    cache_set(f"welcome_toggle:{chat_id}", status)
+    return status
 
 # ==========================================================
 # 🛡 ANTIRAID
@@ -404,4 +411,10 @@ async def create_indexes():
     
     await db.ai_toggles.create_index("chat_id", unique=True)
 
-    logger.info("✅ Database Indexes Created")
+    # Added indexes for newly integrated features
+    await db.feds.create_index("fed_id", unique=True)
+    await db.fed_chats.create_index("chat_id", unique=True)
+    await db.blacklist_chats.create_index("chat_id", unique=True)
+    await db.blacklist_users.create_index("user_id", unique=True)
+
+    logger.info("✅ Database Indexes Created (Including Federation & Blacklist Collections)")
