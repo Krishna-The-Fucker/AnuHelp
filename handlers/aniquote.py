@@ -1,113 +1,104 @@
 # ============================================================
-# 📝 ANI-QUOTE SYSTEM (PYROGRAM VERSION - STABLE)
+# 📝 ANI-QUOTE SYSTEM MODULE
 # ============================================================
 
+__mod_name__ = "📝 ᴀɴɪ-ǫᴜᴏᴛᴇ"
+
+__help__ = """
+*📝 ᴀɴɪ-ǫᴜᴏᴛᴇ ᴍᴏᴅᴜʟᴇ* — Search anime quotes by character or fetch random iconic lines!
+
+• `/aniquote` — Get a random anime quote.
+• `/aniquote [character]` — Search quotes by a specific character (e.g., `/aniquote naruto`).
+• `/aniquote [character] page [number]` — View a specific page of results.
+"""
+
 import re
-import os
 import html
 import aiohttp
+import logging
 from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.enums import ParseMode
 
-# ============================================================
-# MODULE INFO
-# ============================================================
+logger = logging.getLogger("ANIQUOTE")
 
-__MODULE__ = "𝐀ɴɪ-𝐐ᴜᴏᴛᴇ📝"
+def register_aniquote_system(app):
 
-__HELP__ = """
-*𝐀ɴɪ-𝐐ᴜᴏᴛᴇ📝*
-
-*Description:*  
-Search anime quotes by character or get random quotes.
-
-*Commands:*  
-❂ /aniquote — Random quote  
-❂ /aniquote naruto — Search  
-❂ /aniquote luffy page 2 — Page
-"""
-
-
-# ============================================================
-# 🔥 MAIN FUNCTION REGISTER
-# ============================================================
-
-def register_aniquote(app):
-
-    @app.on_message(filters.command("aniquote") & filters.group)
-    async def aniquote_handler(client, message: Message):
-
-        m = message
-
+    @app.on_message(filters.command("aniquote"))
+    async def aniquote_cmd(client, message: Message):
+        
         # =========================
         # PARSE INPUT
         # =========================
         search = None
         page = 1
 
-        if len(m.command) > 1:
-            search = " ".join(m.command[1:])
+        if len(message.command) > 1:
+            search = " ".join(message.command[1:])
 
             page_match = re.search(r'page\s+(\d+)', search, re.IGNORECASE)
             if page_match:
                 page = int(page_match.group(1))
                 search = re.sub(r'page\s+\d+', '', search, flags=re.IGNORECASE).strip()
 
-        random = False if search else True
+        is_random = False if search else True
 
         # =========================
         # LOADING MESSAGE
         # =========================
-        status = await m.reply_text("🎧 Fetching Anime Quotes...")
+        status_msg = await message.reply("🎧 **Fetching Anime Quotes...**")
 
         # =========================
         # FETCH DATA (API)
         # =========================
-        url = "https://animechan.xyz/api/random" if random else f"https://animechan.xyz/api/quotes?character={search}"
+        # Note: animechan API is utilized here
+        url = "https://animechan.xyz/api/random" if is_random else f"https://animechan.xyz/api/quotes?character={search}&page={page}"
 
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as resp:
-                    if resp.status != 200:
-                        return await status.edit("❌ API Error")
+                    if resp.status == 404:
+                        return await status_msg.edit_text(f"❌ **No quotes found for character:** `{search}`")
+                    elif resp.status != 200:
+                        return await status_msg.edit_text("❌ **Anime Quote API is currently unavailable.**")
 
                     data = await resp.json()
 
         except Exception as e:
-            return await status.edit(f"❌ Error:\n`{e}`")
+            logger.error(f"[AniQuote Error]: {e}")
+            return await status_msg.edit_text(f"❌ **An error occurred:** `{str(e)}`")
 
         # =========================
         # NORMALIZE DATA
         # =========================
-        if random:
+        if is_random:
             data = [data]
 
         if not data:
-            return await status.edit("❌ No results found.")
+            return await status_msg.edit_text("❌ **No results found.**")
 
         # =========================
         # LIMIT (ANTI SPAM)
         # =========================
-        data = data[:5]  # max 5 quotes
+        data = data[:5]  # Limit to max 5 quotes to prevent flood waits
 
         # =========================
         # SEND QUOTES
         # =========================
         for q in data:
-            quote = html.escape(q.get("quote", "No quote"))
-            character = html.escape(q.get("character", "Unknown"))
-            anime = html.escape(q.get("anime", "Unknown"))
+            quote = html.escape(q.get("quote", "No quote available."))
+            character = html.escape(q.get("character", "Unknown Character"))
+            anime = html.escape(q.get("anime", "Unknown Anime"))
 
-            text = f"""
-<blockquote>{quote}</blockquote>
-<b>Character:</b> <code>{character}</code>
-<b>Anime:</b> <code>{anime}</code>
-""".strip()
+            text = (
+                f"<blockquote>{quote}</blockquote>\n"
+                f"👤 **Character:** <code>{character}</code>\n"
+                f"🎬 **Anime:** <code>{anime}</code>"
+            )
 
-            await m.reply_text(text, parse_mode=ParseMode.HTML)
+            await message.reply_text(text, parse_mode=ParseMode.HTML)
 
         # =========================
-        # DONE
+        # CLEANUP
         # =========================
-        await status.edit("✅ Quotes Sent Successfully")
+        await status_msg.delete()
