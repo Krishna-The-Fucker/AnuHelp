@@ -1,15 +1,15 @@
 # ============================================================
-# 👋 WELCOME & GREETINGS MANAGEMENT MODULE
+# 👋 WELCOME & GREETINGS MANAGEMENT MODULE (WITH MEDIA & BUTTONS)
 # ============================================================
 
 __mod_name__ = "👋 ᴡᴇʟᴄᴏᴍᴇ"
 
 __help__ = """
-*👋 ᴡᴇʟᴄᴏᴍᴇ ᴍᴏᴅᴜʟᴇ* — Customize and manage greeting messages for new members joining your group, complete with custom inline buttons!
+*👋 ᴡᴇʟᴄᴏᴍᴇ ᴍᴏᴅᴜʟᴇ* — Customize and manage greeting messages and welcome photos for new members joining your group, complete with custom inline buttons!
 
-• `/setwelcome [text]` — Set a custom welcome message for the group (Reply with text or use buttons format).
-• `/welcome` — View the currently active welcome message and preview its buttons.
-• `/delwelcome` — Delete/Reset the custom welcome message.
+• `/setwelcome [text]` — Reply to a photo or text with this command to set a custom welcome message and optional inline buttons.
+• `/welcome` — View the currently active welcome message and preview its settings.
+• `/delwelcome` — Delete/Reset the custom welcome message and photo.
 """
 
 from pyrogram import filters
@@ -33,7 +33,7 @@ def register_welcome_system(app):
             welcome_data = await db.welcome.find_one({"chat_id": chat_id})
             
             for member in message.new_chat_members:
-                # Don't greet if the bot itself joined (or handle separately if needed)
+                # Don't greet if the bot itself joined
                 if member.id == (await client.get_me()).id:
                     continue
 
@@ -43,6 +43,8 @@ def register_welcome_system(app):
 
                 if welcome_data:
                     raw_text = welcome_data.get("text", "Hello {name}, welcome to {title}!")
+                    photo_id = welcome_data.get("photo_id")
+                    
                     # Format standard variables
                     text = raw_text.format(
                         name=name,
@@ -57,12 +59,24 @@ def register_welcome_system(app):
                     if buttons:
                         keyboard = InlineKeyboardMarkup(
                             [
-                                [InlineKeyboardButton(btn["text"], url=btn["url"] if "url" in btn else None, callback_data=btn.get("callback_data")) for btn in row]
+                                [InlineKeyboardButton(btn["text"], url=btn.get("url"), callback_data=btn.get("callback_data")) for btn in row]
                                 for row in buttons
                             ]
                         )
 
-                    await message.reply(text, reply_markup=keyboard, disable_web_page_preview=True)
+                    # Send photo if available, otherwise text message
+                    if photo_id:
+                        await message.reply_photo(
+                            photo=photo_id,
+                            caption=text,
+                            reply_markup=keyboard
+                        )
+                    else:
+                        await message.reply(
+                            text,
+                            reply_markup=keyboard,
+                            disable_web_page_preview=True
+                        )
                 else:
                     # Default fallback welcome
                     await message.reply(f"👋 Hello {mention}, welcome to **{title}**! Enjoy your stay here. 🎉")
@@ -77,26 +91,43 @@ def register_welcome_system(app):
     async def set_welcome_cmd(client, message: Message):
         # Check if user is admin/creator in the chat
         user = await client.get_chat_member(message.chat.id, message.from_user.id)
-        if user.status not in ["creator", "administrator"] and message.from_user.id not in [123456789]: # Add owner override if needed
+        if user.status not in ["creator", "administrator"]:
             return await message.reply("⚠️ **You must be an administrator to set the welcome message!**")
 
-        args = message.text.split(None, 1)
-        if len(args) < 2:
+        # Check if the command is a reply to a photo or has text provided
+        reply = message.reply_to_message
+        photo_id = None
+        full_text = ""
+
+        if reply:
+            if reply.photo:
+                photo_id = reply.photo.file_id
+            elif reply.document and reply.document.mime_type and "image" in reply.document.mime_type:
+                photo_id = reply.document.file_id
+
+            if len(message.command) > 1:
+                full_text = message.text.split(None, 1)[1]
+            elif reply.caption:
+                full_text = reply.caption
+        else:
+            if message.photo:
+                photo_id = message.photo.file_id
+            if len(message.command) > 1:
+                full_text = message.text.split(None, 1)[1]
+
+        if not full_text and not photo_id:
             return await message.reply(
-                "⚠️ **Please provide a welcome message!**\n\n"
+                "⚠️ **Please provide a welcome message or reply to a photo!**\n\n"
                 "• **Variables:** `{name}`, `{mention}`, `{title}`, `{id}`\n"
                 "• **Custom Buttons Syntax Example:**\n"
-                "`/setwelcome Hello {name}! Welcome to {title}.\n\nbutton:Support:https://t.me/your_support`"
+                "`/setwelcome Hello {name}! Welcome to {title}.\n\nbutton:Support:https://t.me/your_support`\n\n"
+                "*(You can also send/reply with a photo along with this command!)*"
             )
 
-        full_text = args[1]
-        welcome_text = full_text
         buttons = []
-
-        # Simple button parser looking for lines starting with 'button:'
-        # Format: button:Label:URL
-        lines = full_text.split("\n")
         clean_lines = []
+        lines = full_text.split("\n")
+        
         for line in lines:
             if line.strip().startswith("button:"):
                 parts = line.strip().split(":", 2)
@@ -108,20 +139,26 @@ def register_welcome_system(app):
 
         welcome_text = "\n".join(clean_lines).strip()
 
+        # If existing data has a photo and user didn't provide a new one via command/reply, retain the old one unless explicitly wanted otherwise
+        existing_data = await db.welcome.find_one({"chat_id": message.chat.id})
+        if not photo_id and existing_data:
+            photo_id = existing_data.get("photo_id")
+
         try:
             await db.welcome.update_one(
                 {"chat_id": message.chat.id},
                 {
                     "$set": {
-                        "text": welcome_text,
-                        "buttons": buttons
+                        "text": welcome_text if welcome_text else (existing_data.get("text", "") if existing_data else ""),
+                        "buttons": buttons,
+                        "photo_id": photo_id
                     }
                 },
                 upsert=True
             )
-            await message.reply("✅ **Custom welcome message and buttons updated successfully for this chat!**")
+            await message.reply("✅ **Custom welcome message, photo, and buttons updated successfully for this chat!**")
         except Exception as e:
-            await message.reply(f"❌ **Failed to save welcome message:** `{str(e)}`")
+            await message.reply(f"❌ **Failed to save welcome configuration:** `{str(e)}`")
 
     # ============================================================
     # 👀 VIEW CURRENT WELCOME (`/welcome`)
@@ -135,6 +172,7 @@ def register_welcome_system(app):
 
             raw_text = welcome_data.get("text", "")
             buttons = welcome_data.get("buttons", [])
+            photo_id = welcome_data.get("photo_id")
 
             # Preview substitution using requester's info
             preview_text = raw_text.format(
@@ -153,11 +191,20 @@ def register_welcome_system(app):
                     ]
                 )
 
-            await message.reply(
-                f"📋 **Current Active Welcome Message Preview:**\n\n--------------------\n{preview_text}",
-                reply_markup=keyboard,
-                disable_web_page_preview=True
-            )
+            full_caption = f"📋 **Current Active Welcome Message Preview:**\n\n--------------------\n{preview_text}"
+
+            if photo_id:
+                await message.reply_photo(
+                    photo=photo_id,
+                    caption=full_caption,
+                    reply_markup=keyboard
+                )
+            else:
+                await message.reply(
+                    full_caption,
+                    reply_markup=keyboard,
+                    disable_web_page_preview=True
+                )
         except Exception as e:
             await message.reply(f"❌ **Failed to fetch welcome message:** `{str(e)}`")
 
@@ -171,15 +218,10 @@ def register_welcome_system(app):
             return await message.reply("⚠️ **You must be an administrator to delete the welcome message!**")
 
         try:
-            result = await db.welcome.deleteOne({"chat_id": message.chat.id})
+            result = await db.welcome.delete_one({"chat_id": message.chat.id})
             if result.deleted_count > 0:
-                await message.reply("🗑️ **Custom welcome message deleted! Default greeting restored.**")
+                await message.reply("🗑️ **Custom welcome message and photo deleted! Default text greeting restored.**")
             else:
                 await message.reply("ℹ️ **There is no custom welcome message configured in this chat.**")
         except Exception as e:
-            # Fallback safe collection delete method
-            try:
-                await db.welcome.delete_one({"chat_id": message.chat.id})
-                await message.reply("🗑️ **Custom welcome message deleted! Default greeting restored.**")
-            except Exception as ex:
-                await message.reply(f"❌ **Failed to delete:** `{str(ex)}`")
+            await message.reply(f"❌ **Failed to delete:** `{str(e)}`")
