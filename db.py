@@ -394,6 +394,78 @@ async def get_antiraid(chat_id):
     return data.get("enabled", False) if data else False
 
 # ==========================================================
+# 💳 ECONOMY & BANKING MODULE DB METHODS 🔥
+# ==========================================================
+
+async def get_bank_account(user_id):
+    data = await db.economy.find_one({"user_id": user_id})
+    if not data:
+        return {"cash": 1000, "bank": 0, "gems": 50}
+    return data
+
+async def update_bank_balance(user_id, cash_change=0, bank_change=0, gems_change=0):
+    user_data = await get_bank_account(user_id)
+    new_cash = max(0, user_data.get("cash", 1000) + cash_change)
+    new_bank = max(0, user_data.get("bank", 0) + bank_change)
+    new_gems = max(0, user_data.get("gems", 50) + gems_change)
+
+    await db.economy.update_one(
+        {"user_id": user_id},
+        {"$set": {"cash": new_cash, "bank": new_bank, "gems": new_gems, "updated": datetime.utcnow()}},
+        upsert=True
+    )
+    return {"cash": new_cash, "bank": new_bank, "gems": new_gems}
+
+# ==========================================================
+# 🥷 UNDERWORLD, MAFIA & HACKER GAMES DB METHODS 🔥
+# ==========================================================
+
+async def get_underworld_profile(user_id):
+    data = await db.underworld.find_one({"user_id": user_id})
+    if not data:
+        return {"respect": 10, "wanted_level": 0, "crew": None, "safehouse": "Alleyway"}
+    return data
+
+async def update_underworld_profile(user_id, respect=0, wanted_level=0, crew=None):
+    profile = await get_underworld_profile(user_id)
+    new_respect = max(0, profile.get("respect", 10) + respect)
+    new_wanted = max(0, min(5, profile.get("wanted_level", 0) + wanted_level))
+    
+    await db.underworld.update_one(
+        {"user_id": user_id},
+        {"$set": {"respect": new_respect, "wanted_level": new_wanted, "crew": crew or profile.get("crew")}},
+        upsert=True
+    )
+
+async def get_mafia_syndicate(syndicate_name):
+    return await db.mafia_syndicates.find_one({"name": syndicate_name})
+
+async def create_mafia_syndicate(name, boss_id):
+    await db.mafia_syndicates.update_one(
+        {"name": name},
+        {"$set": {"boss_id": boss_id, "vault": 0, "members": [boss_id], "created_at": datetime.utcnow()}},
+        upsert=True
+    )
+
+async def get_hacker_profile(user_id):
+    data = await db.hacker.find_one({"user_id": user_id})
+    if not data:
+        return {"firewall": 1, "exploit_level": 1, "bitcoins": 0.0}
+    return data
+
+async def update_hacker_profile(user_id, firewall_change=0, exploit_change=0, btc_change=0.0):
+    hp = await get_hacker_profile(user_id)
+    new_fw = max(1, hp.get("firewall", 1) + firewall_change)
+    new_exp = max(1, hp.get("exploit_level", 1) + exploit_change)
+    new_btc = max(0.0, hp.get("bitcoins", 0.0) + btc_change)
+
+    await db.hacker.update_one(
+        {"user_id": user_id},
+        {"$set": {"firewall": new_fw, "exploit_level": new_exp, "bitcoins": new_btc}},
+        upsert=True
+    )
+
+# ==========================================================
 # ⚙️ INDEXES
 # ==========================================================
 
@@ -411,10 +483,16 @@ async def create_indexes():
     
     await db.ai_toggles.create_index("chat_id", unique=True)
 
+    # Economy & Game indexes
+    await db.economy.create_index("user_id", unique=True)
+    await db.underworld.create_index("user_id", unique=True)
+    await db.mafia_syndicates.create_index("name", unique=True)
+    await db.hacker.create_index("user_id", unique=True)
+
     # Added indexes for newly integrated features
     await db.feds.create_index("fed_id", unique=True)
     await db.fed_chats.create_index("chat_id", unique=True)
     await db.blacklist_chats.create_index("chat_id", unique=True)
     await db.blacklist_users.create_index("user_id", unique=True)
 
-    logger.info("✅ Database Indexes Created (Including Federation & Blacklist Collections)")
+    logger.info("✅ Database Indexes Created (Including Federation, Blacklist, Economy & Game Collections)")
