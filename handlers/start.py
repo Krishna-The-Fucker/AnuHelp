@@ -1,10 +1,10 @@
 # ============================================================
-# 🚀 START & HELP MODULE
+# 🚀 START & HELP MODULE (WITH OWNER BUTTON)
 # ============================================================
 
 from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-from config import BOT_USERNAME, START_VIDEO_URL, SUPPORT_CHAT, LOG_CHANNEL
+from config import BOT_USERNAME, START_VIDEO_URL, SUPPORT_CHAT, LOG_CHANNEL, OWNER_ID
 from db import add_user
 
 # ============================================================
@@ -34,6 +34,7 @@ async def start_handler(client, message: Message):
             InlineKeyboardButton("💬 Support Channel", url=f"https://t.me/{SUPPORT_CHAT}" if SUPPORT_CHAT else "https://t.me/telegram")
         ],
         [
+            InlineKeyboardButton("👑 Owner", url=f"tg://user?id={OWNER_ID}"),
             InlineKeyboardButton("🛠 Help & Commands", callback_data="help_menu")
         ]
     ])
@@ -68,6 +69,9 @@ async def help_command_handler(client, message: Message):
             InlineKeyboardButton("⚙️ General", callback_data="help_general")
         ],
         [
+            InlineKeyboardButton("👑 Owner", url=f"tg://user?id={OWNER_ID}")
+        ],
+        [
             InlineKeyboardButton("« Back to Start", callback_data="start_back")
         ]
     ])
@@ -87,6 +91,9 @@ async def help_menu_callback(client, callback_query: CallbackQuery):
         [
             InlineKeyboardButton("🛡 Moderation", callback_data="help_mod"),
             InlineKeyboardButton("⚙️ General", callback_data="help_general")
+        ],
+        [
+            InlineKeyboardButton("👑 Owner", url=f"tg://user?id={OWNER_ID}")
         ],
         [
             InlineKeyboardButton("« Back to Start", callback_data="start_back")
@@ -133,6 +140,7 @@ async def start_back_callback(client, callback_query: CallbackQuery):
             InlineKeyboardButton("💬 Support Channel", url=f"https://t.me/{SUPPORT_CHAT}" if SUPPORT_CHAT else "https://t.me/telegram")
         ],
         [
+            InlineKeyboardButton("👑 Owner", url=f"tg://user?id={OWNER_ID}"),
             InlineKeyboardButton("🛠 Help & Commands", callback_data="help_menu")
         ]
     ])
