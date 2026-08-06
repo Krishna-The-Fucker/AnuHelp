@@ -203,12 +203,26 @@ STRING_GEN_TIMEOUT = int(os.getenv("STRING_GEN_TIMEOUT", "300"))
 GAMES_ENABLED = os.getenv("GAMES_ENABLED", "True") == "True"
 
 # ============================================================
-# 💳 ECONOMY & BANKING MODULE CONFIGS (ADDED 🔥)
+# 💳 ECONOMY & BANKING MODULE CONFIGS
 # ============================================================
 
 ECONOMY_ENABLED = os.getenv("ECONOMY_ENABLED", "True") == "True"
 STARTING_CASH = int(os.getenv("STARTING_CASH", "100000"))
 DAILY_BONUS_AMOUNT = int(os.getenv("DAILY_BONUS_AMOUNT", "300000"))
+
+# ============================================================
+# 🥷 UNDERWORLD / MAFIA & HACKER GAME CONFIGS (ADDED 🔥)
+# ============================================================
+
+UNDERWORLD_ENABLED = os.getenv("UNDERWORLD_ENABLED", "True") == "True"
+MAFIA_GAME_ENABLED = os.getenv("MAFIA_GAME_ENABLED", "True") == "True"
+HACKER_GAME_ENABLED = os.getenv("HACKER_GAME_ENABLED", "True") == "True"
+
+# Game specific configs
+ROB_SUCCESS_CHANCE = float(os.getenv("ROB_SUCCESS_CHANCE", "0.5"))
+MAX_ROB_PERCENT = float(os.getenv("MAX_ROB_PERCENT", "0.3"))
+STARTING_GEMS = int(os.getenv("STARTING_GEMS", "100"))
+HACK_SUCCESS_CHANCE = float(os.getenv("HACK_SUCCESS_CHANCE", "0.6"))
 
 # ============================================================
 # 🧠 SECURITY FLAGS
@@ -241,4 +255,4 @@ if not API_ID or not API_HASH or not BOT_TOKEN:
 if not MONGO_URI:
     raise ValueError("❌ MONGO_URI required!")
 
-print("✅ CONFIG LOADED SUCCESSFULLY (COMPLETE WITH ALL MODULE PARAMETERS) 🚀")
+print("✅ CONFIG LOADED SUCCESSFULLY (COMPLETE WITH UNDERWORLD, MAFIA & HACKER GAMES) 🚀")
