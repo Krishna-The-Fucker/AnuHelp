@@ -24,3 +24,7 @@ certifi>=2023.11.17
 telegraph>=2.2.0
 requests>=2.31.0
 google-generativeai>=0.3.2
+
+# --- 🎮 ADDED FOR ECONOMY & UNDERWORLD/MAFIA/HACKER GAMES ---
+async-lru>=2.0.4
+orjson>=3.10.0
