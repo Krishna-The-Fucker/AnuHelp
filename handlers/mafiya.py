@@ -10,9 +10,9 @@ __help__ = """
 Commands:
 • `/mafiya` or `/profile` — View your criminal profile, net worth, and stats.
 • `/crime` — Commit a risky crime to earn cash and XP.
-• `/rob <reply>` — Attempt to rob another user in the chat.
+• `/chori <reply>` — Attempt to pickpocket/rob another user in the chat.
 • `/shop` — View the underworld black market shop.
-• `/top` or `/leaderboard` — View top 10 global or group criminals!
+• `/top` or `/leaderboard` — View top 10 global criminals!
 """
 
 from pyrogram import filters
@@ -30,10 +30,9 @@ def register_mafiya_system(app, db):
         if not user:
             return
 
-        chat_id = message.chat.id
         user_id = user.id
 
-        # Fetch user stats from database (Global tracking via user_id, chat tracking optionally)
+        # Fetch user stats from database
         user_data = await db.mafiya_users.find_one({"user_id": user_id})
         
         if not user_data:
@@ -125,6 +124,78 @@ def register_mafiya_system(app, db):
         await message.reply_text(text, reply_markup=back_markup)
 
     # ============================================================
+    # 🥷 CHORI / PICKPOCKET COMMAND (`/chori`)
+    # ============================================================
+    @app.on_message(filters.command("chori") & filters.group)
+    async def chori_cmd(client, message: Message):
+        user = message.from_user
+        if not user:
+            return
+
+        if not message.reply_to_message or not message.reply_to_message.from_user:
+            return await message.reply_text("⚠️ **Please reply to someone's message to do `chori` (rob) from them!**")
+
+        target_user = message.reply_to_message.from_user
+        if target_user.id == user.id:
+            return await message.reply_text("❌ **Arey bhai, khud ki hi jeb kaatoge kya? Kisi aur ko target karo!** 🤡")
+
+        if target_user.is_bot:
+            return await message.reply_text("❌ **Bots ke paas cash nahi hota dost!** 🤖")
+
+        # Fetch robber data
+        robber_data = await db.mafiya_users.find_one({"user_id": user.id})
+        if not robber_data:
+            robber_data = {"cash": 1000, "xp": 0, "level": 1}
+            await db.mafiya_users.update_one({"user_id": user.id}, {"$set": robber_data}, upsert=True)
+
+        # Fetch target data
+        target_data = await db.mafiya_users.find_one({"user_id": target_user.id})
+        if not target_data:
+            target_data = {"cash": 1000, "xp": 0, "level": 1}
+            await db.mafiya_users.update_one({"user_id": target_user.id}, {"$set": target_data}, upsert=True)
+
+        target_cash = target_data.get("cash", 1000)
+        if target_cash < 200:
+            return await message.reply_text(f"⚠️ **{target_user.first_name} ke paas chori karne ke liye kafi cash nahi hai!** 🪙")
+
+        # Success rate calculation (50% chance)
+        success = random.choice([True, False])
+        back_markup = InlineKeyboardMarkup([[InlineKeyboardButton("« Back", callback_data="help_back")]])
+
+        if success:
+            steal_amount = random.randint(100, min(800, target_cash // 2))
+            
+            # Update robber cash
+            await db.mafiya_users.update_one(
+                {"user_id": user.id},
+                {"$inc": {"cash": steal_amount, "xp": 15}}
+            )
+            # Update target cash
+            await db.mafiya_users.update_one(
+                {"user_id": target_user.id},
+                {"$inc": {"cash": -steal_amount}}
+            )
+
+            await message.reply_text(
+                f"🥷✨ **Successful Chori!**\n\n"
+                f"• `{user.first_name}` ne chupke se `{target_user.first_name}` ki jeb se **${steal_amount:,}** chura liye! 💵💸",
+                reply_markup=back_markup
+            )
+        else:
+            penalty = random.randint(100, 300)
+            # Update robber penalty
+            await db.mafiya_users.update_one(
+                {"user_id": user.id},
+                {"$inc": {"cash": -penalty}}
+            )
+
+            await message.reply_text(
+                f"🚨👮‍♂️ **Chori Failed!**\n\n"
+                f"• `{target_user.first_name}` ne pakad liya! `{user.first_name}` ko bhaagte waqt fine ke roop me **${penalty:,}** gavane pade! 🏃‍♂️💨",
+                reply_markup=back_markup
+            )
+
+    # ============================================================
     # 🏆 LEADERBOARD COMMAND (`/top` & `/leaderboard`)
     # ============================================================
     @app.on_message(filters.command(["top", "leaderboard", "mafiyatop"]) & filters.group)
@@ -135,7 +206,6 @@ def register_mafiya_system(app, db):
         back_markup = InlineKeyboardMarkup([[InlineKeyboardButton("« Back", callback_data="help_back")]])
 
         if mode == "global":
-            # Fetch top 10 users globally by cash + bank (Net worth)
             cursor = db.mafiya_users.find().sort([("cash", -1), ("level", -1)]).limit(10)
             top_users = await cursor.to_list(length=10)
 
@@ -151,14 +221,14 @@ def register_mafiya_system(app, db):
                 medal = "🥇" if index == 1 else "🥈" if index == 2 else "🥉" if index == 3 else f"#{index}"
                 text += f"{medal} **{name}** — Lv. `{level}` | 💵 `${cash:,}`\n"
 
-            text += "\n_Tip: Use `/crime` to earn cash and climb the leaderboard!_"
+            text += "\n_Tip: Use `/crime` or `/chori` to earn cash and climb the leaderboard!_"
             await message.reply_text(text, reply_markup=back_markup)
 
         else:
             await message.reply_text(
                 "📊 **MAFIYA LEADERBOARD USAGE**\n\n"
                 "• `/top global` — View top 10 global criminals across all groups.\n"
-                "• Use `/crime` or `/rob` to increase your wealth!",
+                "• Use `/crime` or `/chori` to increase your wealth!",
                 reply_markup=back_markup
             )
 
