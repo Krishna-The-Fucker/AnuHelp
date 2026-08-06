@@ -34,7 +34,7 @@ def register_misc_system(app):
             "🏃‍♀️💨 Running away, huh? Coward!",
             "Where's the fire?",
             "💨 Zoom!",
-            "🏃‍♂️ Running won't save you from Nomad Bot!",
+            "🏃‍♂️ Running won't save you from ᴀɴᴜ x ʜᴇʟᴩ Bot!",
             "And they're off! 🐎"
         )
         await message.reply(random.choice(RUN_STRINGS))
