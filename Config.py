@@ -203,6 +203,14 @@ STRING_GEN_TIMEOUT = int(os.getenv("STRING_GEN_TIMEOUT", "300"))
 GAMES_ENABLED = os.getenv("GAMES_ENABLED", "True") == "True"
 
 # ============================================================
+# 💳 ECONOMY & BANKING MODULE CONFIGS (ADDED 🔥)
+# ============================================================
+
+ECONOMY_ENABLED = os.getenv("ECONOMY_ENABLED", "True") == "True"
+STARTING_CASH = int(os.getenv("STARTING_CASH", "100000"))
+DAILY_BONUS_AMOUNT = int(os.getenv("DAILY_BONUS_AMOUNT", "300000"))
+
+# ============================================================
 # 🧠 SECURITY FLAGS
 # ============================================================
 
