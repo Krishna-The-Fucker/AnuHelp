@@ -5,21 +5,39 @@
 __mod_name__ = "🛠️ ᴍɪꜱᴄ"
 
 __help__ = """
-*🛠️ ᴍɪꜱᴄᴇʟʟᴀɴᴇᴏᴜꜱ ᴜᴛɪʟɪᴛɪᴇꜱ* — A collection of handy utility commands ranging from ID lookup to text formatting and pinging.
+*🛠️ ᴍɪꜱᴄᴇʟʟᴀɴᴇᴏᴜꜱ ᴜᴛɪʟɪᴛɪᴇꜱ* — An "odds and ends" module for small, simple commands which don't really fit anywhere.
 
-• `/id` — Get your user ID, the chat ID, or the replied user's ID.
-• `/ping` — Check the bot's response latency/speed.
-• `/info` — Get user information and account details.
-• `/stats` — View general bot statistics and database metrics.
+• `/runs` — Respond with a randomly generated "run away" string.
+• `/id` — Get the ID of a user, group, or channel. Can be used by reply, username, or mention.
+• `/info` — Get a user's info.
+• `/donate` — Donate to the bot creator.
+• `/markdownhelp` — Information on how to use markdown with the bot. PM only.
+• `/limits` — Show the bot's limits.
 """
 
 from pyrogram import filters
 from pyrogram.types import Message
-import time
-from datetime import datetime
+import random
 from db import db
 
 def register_misc_system(app):
+
+    # ============================================================
+    # 🏃 RUNS COMMAND (`/runs`)
+    # ============================================================
+    @app.on_message(filters.command("runs"))
+    async def runs_cmd(client, message: Message):
+        RUN_STRINGS = (
+            "Where do you think you're going?",
+            "🏃‍♂️💨 There goes another one...",
+            "You can run, but you can't hide!",
+            "🏃‍♀️💨 Running away, huh? Coward!",
+            "Where's the fire?",
+            "💨 Zoom!",
+            "🏃‍♂️ Running won't save you from Nomad Bot!",
+            "And they're off! 🐎"
+        )
+        await message.reply(random.choice(RUN_STRINGS))
 
     # ============================================================
     # 🆔 ID LOOKUP (`/id`)
@@ -29,6 +47,21 @@ def register_misc_system(app):
         chat = message.chat
         user = message.from_user
         reply = message.reply_to_message
+
+        # Check if argument is passed (e.g., /id @username or chat id)
+        if len(message.command) > 1:
+            query = message.command[1].strip()
+            try:
+                if query.startswith("@") or query.lstrip("-").isdigit():
+                    resolved_chat = await client.get_chat(query)
+                    return await message.reply(
+                        f"🆔 **IDENTIFICATION SYSTEM**\n\n"
+                        f"💬 **Title/Name:** `{resolved_chat.title or resolved_chat.first_name}`\n"
+                        f"📌 **ID:** `{resolved_chat.id}`\n"
+                        f"🔹 **Type:** `{resolved_chat.type.name}`"
+                    )
+            except Exception as e:
+                return await message.reply(f"❌ **Could not resolve ID for:** `{query}`\nError: `{str(e)}`")
 
         text = f"🆔 **IDENTIFICATION SYSTEM**\n\n"
         
@@ -47,18 +80,6 @@ def register_misc_system(app):
         await message.reply(text)
 
     # ============================================================
-    # 🏓 PING SPEED TEST (`/ping`)
-    # ============================================================
-    @app.on_message(filters.command("ping"))
-    async def ping_cmd(client, message: Message):
-        start_time = time.time()
-        ping_msg = await message.reply("🏓 **Pinging...**")
-        end_time = time.time()
-        
-        latency = round((end_time - start_time) * 1000, 2)
-        await ping_msg.edit_text(f"🏓 **Pong!**\nLatency: `{latency}ms` ⚡")
-
-    # ============================================================
     # ℹ️ USER INFO (`/info`)
     # ============================================================
     @app.on_message(filters.command("info"))
@@ -66,15 +87,22 @@ def register_misc_system(app):
         target_user = message.from_user
         if message.reply_to_message and message.reply_to_message.from_user:
             target_user = message.reply_to_message.from_user
+        elif len(message.command) > 1:
+            try:
+                query = message.command[1].strip()
+                target_user = await client.get_users(query)
+            except Exception:
+                pass
 
         if not target_user:
             return await message.reply("⚠️ **Could not fetch user information!**")
 
+        username_str = f"@{target_user.username}" if target_user.username else 'None'
         info_text = (
             f"👤 **USER INFORMATION SUMMARY**\n\n"
             f"• **First Name:** `{target_user.first_name}`\n"
             f"• **Last Name:** `{target_user.last_name or 'None'}`\n"
-            f"• **Username:** `@{target_user.username}` if target_user.username else 'None'\n"
+            f"• **Username:** `{username_str}`\n"
             f"• **User ID:** `{target_user.id}`\n"
             f"• **Is Bot:** `{target_user.is_bot}`\n"
             f"• **DC ID:** `{target_user.dc_id or 'Unknown'}`"
@@ -82,25 +110,66 @@ def register_misc_system(app):
         await message.reply(info_text)
 
     # ============================================================
-    # 📊 BOT STATISTICS (`/stats`)
+    # 💖 DONATE COMMAND (`/donate`)
     # ============================================================
-    @app.on_message(filters.command("stats"))
-    async def bot_stats_cmd(client, message: Message):
-        status_msg = await message.reply("📊 **Gathering database metrics...**")
+    @app.on_message(filters.command("donate"))
+    async def donate_cmd(client, message: Message):
+        donate_text = (
+            f"💖 **SUPPORT THE DEVELOPER**\n\n"
+            f"Thank you for wanting to support the creation and maintenance of **Nomad Bot**!\n\n"
+            f"You can support via:\n"
+            f"• **UPI / QR:** Contact the developer directly.\n"
+            f"• **Crypto / GitHub Sponsors:** Coming soon!\n\n"
+            f"Your support helps keep servers running 24/7 with ultra-fast responses! 🚀"
+        )
+        await message.reply(donate_text)
 
-        try:
-            users_count = await db.users.count_documents({})
-            chats_count = await db.language.count_documents({})
-            warns_count = await db.warns.count_documents({})
-
-            stats_text = (
-                f"📈 **NOMAD BOT SYSTEM STATISTICS**\n\n"
-                f"• **Registered Users:** `{users_count}`\n"
-                f"• **Active Groups:** `{chats_count}`\n"
-                f"• **Active Warnings Logged:** `{warns_count}`\n"
-                f"• **Status:** `🟢 Optimal & Operational`"
+    # ============================================================
+    # 📝 MARKDOWN HELP (`/markdownhelp`) - PM ONLY
+    # ============================================================
+    @app.on_message(filters.command("markdownhelp"))
+    async def markdown_help_cmd(client, message: Message):
+        if message.chat.type.name != "PRIVATE":
+            bot_username = (await client.get_me()).username
+            return await message.reply(
+                "⚠️ **Markdown Help can only be viewed in Private Chat (PM)** to avoid group spam.",
+                reply_markup=pyrogram.types.InlineKeyboardMarkup([[
+                    pyrogram.types.InlineKeyboardButton("📤 Open in PM", url=f"https://t.me/{bot_username}?start=markdownhelp")
+                ]])
             )
-            await status_msg.edit_text(stats_text)
 
-        except Exception as e:
-            await status_msg.edit_text(f"❌ **Failed to load stats:** `{str(e)}`")
+        md_text = (
+            f"📖 **MARKDOWN FORMATTING GUIDE**\n\n"
+            f"Nomad Bot supports rich formatting for welcomes, rules, notes, and filters:\n\n"
+            f"• **Bold:** `**text**` -> **text**\n"
+            f"• **Italic:** `__text__` or `*text*` -> *text*\n"
+            f"• **Monospace / Code:** `` `text` `` -> `text`\n"
+            f"• **Strikethrough:** `~text~` -> ~text~\n"
+            f"• **Underline:** `--text--` -> <u>text</u>\n"
+            f"• **Spoiler:** `||text||` -> ||text||\n"
+            f"• **Link:** `[Text](https://example.com)` -> [Text](https://example.com)\n\n"
+            f"📌 **Available Variables:**\n"
+            f"• `{first}` - User's first name\n"
+            f"• `{last}` - User's last name\n"
+            f"• `{fullname}` - User's full name\n"
+            f"• `{username}` - User's username\n"
+            f"• `{mention}` - Mention user with tag\n"
+            f"• `{chat}` - Group title"
+        )
+        await message.reply(md_text)
+
+    # ============================================================
+    # 📊 LIMITS COMMAND (`/limits`)
+    # ============================================================
+    @app.on_message(filters.command("limits"))
+    async def limits_cmd(client, message: Message):
+        limits_text = (
+            f"⚙️ **NOMAD BOT SYSTEM LIMITS**\n\n"
+            f"• **Max Filters per Chat:** `Unlimited (DB Backed)`\n"
+            f"• **Max Notes per Chat:** `Unlimited (DB Backed)`\n"
+            f"• **Max Warn Limit:** `10 Warns`\n"
+            f"• **Max Pinned Messages:** `1 Active Pin Cache`\n"
+            f"• **Flood Control:** `Active (Async Engine)`\n"
+            f"• **Database Engine:** `Motor / MongoDB (Optimized)`"
+        )
+        await message.reply(limits_text)
