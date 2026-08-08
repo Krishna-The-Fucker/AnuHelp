@@ -50,7 +50,7 @@ IGNORE_SUDO = os.getenv("IGNORE_SUDO", "True") == "True"
 
 SUPPORT_CHAT = int(os.getenv("SUPPORT_CHAT", "-1003936239127"))
 LOG_CHANNEL = int(os.getenv("LOG_CHANNEL", "-1003936239127"))
-START_VIDEO_URL = os.getenv("START_VIDEO_URL", "https://envs.sh/q3z.mp4")
+START_VIDEO_URL = os.getenv("START_VIDEO_URL", "https://n.uguu.se/nQlDgtaT.mp4")
 
 # ============================================================
 # ⚠️ WARN SYSTEM
@@ -118,7 +118,7 @@ LOCK_TYPES = [
     "all", "photo", "video", "gif", "sticker",
     "link", "forward", "bots", "audio",
     "voice", "document", "poll",
-    "emoji", "url", "hashtag", "edit"
+    "emoji", "url", "hashtag", "edit", "file",
 ]
 
 # ============================================================
