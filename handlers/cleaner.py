@@ -7,13 +7,13 @@ __mod_name__ = "🧹 ᴄʟᴇᴀɴᴇʀ"
 __help__ = """
 *🧹 ᴍᴇssᴀɢᴇ ᴄʟᴇᴀɴᴇʀ* — Advanced group cleanup tools to delete messages, purge bulk histories, and remove bot/user clutter instantly.
 
-• `/purge` — Reply to a message to delete all messages from that point up to the latest.
-• `/del` — Delete a specific replied-to message.
-• `/purge [count]` — Delete a specific number of recent messages.
+• `/pall` — Reply to a message to delete all messages from that point up to the latest, or specify a count (e.g. `/pall 50`).
+• `/delete` — Delete a specific replied-to message.
 """
 
 from pyrogram import filters
 from pyrogram.types import Message
+import asyncio
 import logging
 
 def register_cleaner_system(app):
@@ -37,9 +37,9 @@ def register_cleaner_system(app):
         return True
 
     # ============================================================
-    # 🗑️ DELETE SINGLE MESSAGE (`/del`)
+    # 🗑️ DELETE SINGLE MESSAGE (`/delete`)
     # ============================================================
-    @app.on_message(filters.command("del") & ~filters.private)
+    @app.on_message(filters.command("delete") & ~filters.private)
     async def delete_single_message_cmd(client, message: Message):
         if not await check_cleaner_permissions(message):
             return
@@ -55,9 +55,9 @@ def register_cleaner_system(app):
             await message.reply(f"❌ **Failed to delete message:** `{str(e)}`")
 
     # ============================================================
-    # 🧹 PURGE MESSAGES (`/purge`)
+    # 🧹 PURGE / PALL MESSAGES (`/pall`)
     # ============================================================
-    @app.on_message(filters.command("purge") & ~filters.private)
+    @app.on_message(filters.command("pall") & ~filters.private)
     async def purge_messages_cmd(client, message: Message):
         if not await check_cleaner_permissions(message):
             return
@@ -88,19 +88,19 @@ def register_cleaner_system(app):
 
             # Send a temporary notification of success
             notif = await message.reply("✨ **Purge completed successfully!**")
-            await client.sleep(3) if hasattr(client, "sleep") else None
+            await asyncio.sleep(3)
             try:
                 await notif.delete()
             except Exception:
                 pass
             return
 
-        # Scenario B: `/purge [count]` provided
+        # Scenario B: `/pall [count]` provided
         if len(message.command) > 1:
             try:
                 count = int(message.command[1])
             except ValueError:
-                return await message.reply("⚠️ **Please provide a valid number of messages to purge! Example:** `/purge 25`")
+                return await message.reply("⚠️ **Please provide a valid number of messages to purge! Example:** `/pall 25`")
 
             if count < 1 or count > 500:
                 return await message.reply("⚠️ **You can only purge between 1 and 500 messages at once!**")
@@ -124,6 +124,7 @@ def register_cleaner_system(app):
 
             notif = await message.reply(f"✨ **Successfully purged last {count} messages!**")
             try:
+                await asyncio.sleep(3)
                 await notif.delete()
             except Exception:
                 pass
@@ -131,6 +132,6 @@ def register_cleaner_system(app):
 
         await message.reply(
             "⚠️ **Invalid purge usage!**\n\n"
-            "📌 **Usage 1:** Reply to a message with `/purge`\n"
-            "📌 **Usage 2:** Type `/purge [count]` (e.g., `/purge 50`)"
+            "📌 **Usage 1:** Reply to a message with `/pall`\n"
+            "📌 **Usage 2:** Type `/pall [count]` (e.g., `/pall 50`)"
         )
