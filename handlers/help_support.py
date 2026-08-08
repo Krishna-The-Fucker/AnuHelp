@@ -2,12 +2,12 @@
 # 💎 MODERN SUPPORT & ULTIMATE HELP SYSTEM (85+ MODULES PRO MAX)
 # ============================================================
 
-__mod_name = "💎 sᴜᴘᴘᴏʀᴛ & ʜᴇʟᴘ"
+__mod_name__ = "💎 ꜱᴜᴘᴘᴏʀᴛ & ʜᴇʟᴘ"
 
 __help__ = """
-*💎 ULTIMATE BOT HELP MENU (85+ MODULES)* — Explore all available commands below!
+*💎 ᴜʟᴛɪᴍᴀᴛᴇ ʙᴏᴛ ʜᴇʟᴘ ᴍᴇɴᴜ (𝟾𝟻+ ᴍᴏᴅᴜʟᴇꜱ)* — ᴇxᴘʟᴏʀᴇ ᴀʟʟ ᴀᴠᴀɪʟᴀʙʟᴇ ᴄᴏᴍᴍᴀɴᴅꜱ ʙᴇʟᴏᴡ!
 
-Click any button to view detailed usage instructions for that specific feature. Use Next/Back to navigate through all modules.
+ᴄʟɪᴄᴋ ᴀɴʏ ʙᴜᴛᴛᴏɴ ᴛᴏ ᴠɪᴇᴡ ᴅᴇᴛᴀɪʟᴇᴅ ᴜꜱᴀɢᴇ ɪɴꜱᴛʀᴜᴄᴛɪᴏɴꜱ ꜰᴏʀ ᴛʜᴀᴛ ꜱᴘᴇᴄɪꜰɪᴄ ꜰᴇᴀᴛᴜʀᴇ. ᴜꜱᴇ ɴᴇxᴛ/ʙᴀᴄᴋ/ʜᴏᴍᴇ ᴛᴏ ɴᴀᴠɪɢᴀᴛᴇ ᴛʜʀᴏᴜɢʜ ᴀʟʟ ᴍᴏᴅᴜʟᴇꜱ.
 """
 
 from pyrogram import filters
@@ -35,7 +35,7 @@ def register_support_system(app, db, SUPPORT_CHAT: int, ADMINS: list):
         return f"TKT-{random.randint(1000, 9999)}"
 
     # ============================================================
-    # 📋 85+ MODULES HELP TEXTS & USAGE
+    # 📋 85+ MODULES HELP TEXTS & USAGE (STYLISH FONT FORMATTED)
     # ============================================================
     HELP_TEXTS = {
         "abuse": "🛡️ **Abuse Control**\n\n• **Usage:** Automatically filters or restricts abusive words and slang in chats.",
@@ -125,36 +125,52 @@ def register_support_system(app, db, SUPPORT_CHAT: int, ADMINS: list):
     }
 
     # ============================================================
-    # 📄 PAGINATED KEYBOARDS (PAGE 1 TO 5)
+    # 📄 6-PART PAGINATED KEYBOARDS (WITH NEXT, BACK, HOME BUTTONS)
     # ============================================================
     def get_help_keyboard(page=1):
         keys = list(HELP_TEXTS.keys())
-        per_page = 14  # 14 modules per page
+        total_items = len(keys)
+        
+        # Divided precisely into 6 parts/pages
+        per_page = (total_items + 5) // 6 
+        if per_page < 1:
+            per_page = 1
+
         start_idx = (page - 1) * per_page
         end_idx = start_idx + per_page
         current_keys = keys[start_idx:end_idx]
 
         keyboard = []
         row = []
-        for i, k in enumerate(current_keys):
-            row.append(InlineKeyboardButton(k.replace("_", " ").title(), callback_data=f"help_{k}_{page}"))
+        for k in current_keys:
+            # Stylish small caps formatting for button text using the given font style
+            display_name = "".join([
+                {"a": "ᴀ", "b": "ʙ", "c": "ᴄ", "d": "ᴅ", "e": "ᴇ", "f": "ꜰ", "g": "ɢ", "h": "ʜ", "i": "ɪ", "j": "ᴊ", "k": "ᴋ", "l": "ʟ", "m": "ᴍ", "n": "ɴ", "o": "ᴏ", "p": "ᴘ", "q": "ǫ", "r": "ʀ", "s": "ꜱ", "t": "ᴛ", "u": "ᴜ", "v": "ᴠ", "w": "ᴡ", "x": "𝗡" if False else "x", "y": "ʏ", "z": "ᴢ", "_": " "}.get(c, c)
+                for c in k.replace("_", " ").lower()
+            ]).title()
+
+            row.append(InlineKeyboardButton(display_name, callback_data=f"help_{k}_{page}"))
             if len(row) == 2:
                 keyboard.append(row)
                 row = []
         if row:
             keyboard.append(row)
 
-        # Pagination Navigation Buttons
+        # Pagination Navigation Buttons (Back, Home, Next)
         nav_buttons = []
-        total_pages = (len(keys) + per_page - 1) // per_page
+        total_pages = 6
+        
         if page > 1:
-            nav_buttons.append(InlineKeyboardButton("⬅️ Back", callback_data=f"help_page_{page-1}"))
+            nav_buttons.append(InlineKeyboardButton("⬅️ ʙᴀᴄᴋ", callback_data=f"help_page_{page-1}"))
+        
+        nav_buttons.append(InlineKeyboardButton("🏠 ʜᴏᴍᴇ", callback_data="help_page_1"))
         nav_buttons.append(InlineKeyboardButton(f"📄 {page}/{total_pages}", callback_data="help_noop"))
-        if page < total_pages:
-            nav_buttons.append(InlineKeyboardButton("Next ➡️", callback_data=f"help_page_{page+1}"))
+        
+        if page < total_pages and end_idx < total_items:
+            nav_buttons.append(InlineKeyboardButton("ɴᴇxᴛ ➡️", callback_data=f"help_page_{page+1}"))
         
         keyboard.append(nav_buttons)
-        keyboard.append([InlineKeyboardButton("❌ Close Menu", callback_data="help_close")])
+        keyboard.append([InlineKeyboardButton("❌ ᴄʟᴏꜱᴇ ᴍᴇɴᴜ", callback_data="help_close")])
         return InlineKeyboardMarkup(keyboard)
 
     # ============================================================
@@ -180,8 +196,11 @@ def register_support_system(app, db, SUPPORT_CHAT: int, ADMINS: list):
         if mod == "close":
             return await callback.message.delete()
 
-        text = HELP_TEXTS.get(mod, "❌ **Module information not available.**")
-        back_kb = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back to Menu", callback_data=f"help_page_{page}")]])
+        text = HELP_TEXTS.get(mod, "❌ **ᴍᴏᴅᴜʟᴇ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ ɴᴏᴛ ᴀᴠᴀɪʟᴀʙʟᴇ.**")
+        back_kb = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🔙 ʙᴀᴄᴋ ᴛᴏ ᴍᴇɴᴜ", callback_data=f"help_page_{page}")],
+            [InlineKeyboardButton("🏠 ʜᴏᴍᴇ", callback_data="help_page_1")]
+        ])
 
         try:
             await callback.message.edit_text(text, reply_markup=back_kb)
@@ -191,7 +210,7 @@ def register_support_system(app, db, SUPPORT_CHAT: int, ADMINS: list):
 
     @app.on_callback_query(filters.regex(r"^help_noop$"))
     async def noop_callback(client, callback):
-        await callback.answer("You are on this page!", show_alert=False)
+        await callback.answer("ʏᴏᴜ ᴀʀᴇ ᴏɴ ᴛʜɪꜱ ᴘᴀɢᴇ!", show_alert=False)
 
     @app.on_callback_query(filters.regex(r"^help_close$"))
     async def close_help_menu(client, callback):
