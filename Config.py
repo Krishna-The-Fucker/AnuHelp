@@ -24,13 +24,13 @@ DEEP_AI_API_KEY = os.getenv("DEEP_AI_API_KEY", "")
 # ============================================================
 
 MONGO_URI = os.getenv("MONGO_URI", "")
-DB_NAME = os.getenv("DB_NAME", "RoseUltraDB")
+DB_NAME = os.getenv("DB_NAME", "AnuDB")
 
 # ============================================================
 # 👑 OWNER / BOT INFO
 # ============================================================
 
-OWNER_ID = int(os.getenv("OWNER_ID", "0"))
+OWNER_ID = int(os.getenv("OWNER_ID", "8315627692"))
 BOT_USERNAME = os.getenv("BOT_USERNAME", "Anu_helpbot")
 
 # ============================================================
@@ -48,8 +48,8 @@ IGNORE_SUDO = os.getenv("IGNORE_SUDO", "True") == "True"
 # 📢 CHANNEL / LOGS & STARTUP MEDIA
 # ============================================================
 
-SUPPORT_CHAT = int(os.getenv("SUPPORT_CHAT", "0"))
-LOG_CHANNEL = int(os.getenv("LOG_CHANNEL", "0"))
+SUPPORT_CHAT = int(os.getenv("SUPPORT_CHAT", "-1003936239127"))
+LOG_CHANNEL = int(os.getenv("LOG_CHANNEL", "-1003936239127"))
 START_VIDEO_URL = os.getenv("START_VIDEO_URL", "https://envs.sh/q3z.mp4")
 
 # ============================================================
