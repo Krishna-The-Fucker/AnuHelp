@@ -48,8 +48,12 @@ IGNORE_SUDO = os.getenv("IGNORE_SUDO", "True") == "True"
 # 📢 CHANNEL / LOGS & STARTUP MEDIA
 # ============================================================
 
-SUPPORT_CHAT = int(os.getenv("SUPPORT_CHAT", "-1003936239127"))
+SUPPORT_CHAT = int(os.getenv("SUPPORT_CHAT", "https://t.me/+MoDgQrl3Cn0yNDRk"))
 LOG_CHANNEL = int(os.getenv("LOG_CHANNEL", "-1003936239127"))
+
+# 📢 UPDATE CHANNEL (ADDED 🔥)
+UPDATE_CHANNEL = os.getenv("UPDATE_CHANNEL", "https://t.me/KRISHNA_BOTS")
+
 START_VIDEO_URL = os.getenv("START_VIDEO_URL", "https://n.uguu.se/nQlDgtaT.mp4")
 
 # ============================================================
@@ -255,4 +259,4 @@ if not API_ID or not API_HASH or not BOT_TOKEN:
 if not MONGO_URI:
     raise ValueError("❌ MONGO_URI required!")
 
-print("✅ CONFIG LOADED SUCCESSFULLY (COMPLETE WITH UNDERWORLD, MAFIA & HACKER GAMES) 🚀")
+print("✅ CONFIG LOADED SUCCESSFULLY (COMPLETE WITH UPDATE CHANNEL, UNDERWORLD & GAMES) 🚀")
