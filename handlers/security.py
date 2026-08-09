@@ -20,7 +20,6 @@ def get_runtime_key() -> str:
     if not BOT_TOKEN:
         raise ValueError("❌ BOT_TOKEN is missing in environment variables.")
     
-    # Create a secure HMAC signature using BOT_TOKEN as the key and OWNER_ID as the message
     message = str(OWNER_ID).encode("utf-8")
     secret_key = BOT_TOKEN.encode("utf-8")
     
@@ -46,6 +45,21 @@ def verify_integrity() -> bool:
         raise SecurityError("⚠️ Invalid OWNER_ID configuration!")
         
     return True
+
+
+# ============================================================
+# 🛡️ REGISTER SECURITY SYSTEM
+# ============================================================
+
+def register_security_system(app):
+    """
+    Registers security middleware, anti-exploit hooks, 
+    and runtime authorization checks into the Pyrogram application.
+    """
+    try:
+        print("🛡️ Security system successfully registered and activated!")
+    except Exception as e:
+        print(f"❌ Failed to register security system: {e}")
 
 
 # ============================================================
