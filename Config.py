@@ -24,7 +24,7 @@ DEEP_AI_API_KEY = os.getenv("DEEP_AI_API_KEY", "")
 # ============================================================
 
 MONGO_URI = os.getenv("MONGO_URI", "")
-DB_NAME = os.getenv("DB_NAME", "AnuDB")
+DB_NAME = os.getenv("DB_NAME", "AnuHelp")
 
 # ============================================================
 # 👑 OWNER / BOT INFO
