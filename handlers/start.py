@@ -27,15 +27,15 @@ async def start_handler(client, message: Message):
     
     keyboard = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("➕ Add Me To Your Group", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
+            InlineKeyboardButton("➕ ᴀᴅᴅ ᴍᴇ ʏᴏᴜʀ ɢʀᴏᴜᴩ ➕", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
         ],
         [
-            InlineKeyboardButton("📢 Update Channel", url=f"https://t.me/{LOG_CHANNEL}" if LOG_CHANNEL else "https://t.me/krishna_bots"),
-            InlineKeyboardButton("💬 Support Channel", url=f"https://t.me/{SUPPORT_CHAT}" if SUPPORT_CHAT else "https://t.me/+MoDgQrl3Cn0yNDRk")
+            InlineKeyboardButton("📢 ᴜᴩᴅᴀᴛᴇ", url=f"https://t.me/{LOG_CHANNEL}" if LOG_CHANNEL else "https://t.me/krishna_bots"),
+            InlineKeyboardButton("💬 ꜱᴜᴩᴩσʀᴛ", url=f"https://t.me/{SUPPORT_CHAT}" if SUPPORT_CHAT else "https://t.me/+MoDgQrl3Cn0yNDRk")
         ],
         [
-            InlineKeyboardButton("👑 Owner", url=f"tg://user?id={OWNER_ID}"),
-            InlineKeyboardButton("🛠 Help & Commands", callback_data="help_menu")
+            InlineKeyboardButton("👑 σᴡηᴇʀ", url=f"tg://user?id={OWNER_ID}"),
+            InlineKeyboardButton("🛠ʜᴇʟᴩ & ꜰᴇᴀᴛᴜʀᴇꜱ", callback_data="help_menu")
         ]
     ])
 
@@ -47,7 +47,7 @@ async def start_handler(client, message: Message):
         )
     else:
         await message.reply_photo(
-            photo=START_VIDEO_URL if START_VIDEO_URL else "https://envs.sh/q3z.jpg",
+            photo=START_VIDEO_URL if START_VIDEO_URL else "https://n.uguu.se/nQlDgtaT.mp4",
             caption=caption,
             reply_markup=keyboard
         )
@@ -66,10 +66,10 @@ async def help_handler(client, update):
     )
     keyboard = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("👑 Owner", url=f"tg://user?id={OWNER_ID}")
+            InlineKeyboardButton("👑 σᴡηᴇʀ", url=f"tg://user?id={OWNER_ID}")
         ],
         [
-            InlineKeyboardButton("« Back to Start", callback_data="start_back")
+            InlineKeyboardButton("« ʙᴀᴄᴋ ᴛᴏ ꜱᴛᴀʀᴛ", callback_data="start_back")
         ]
     ])
     
@@ -93,7 +93,7 @@ async def start_back_callback(client, callback_query: CallbackQuery):
     )
     keyboard = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("➕ Add Me To Your Group", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
+            InlineKeyboardButton("➕ ᴀᴅᴅ ᴍᴇ ʏᴏᴜʀ ɢʀᴏᴜᴩ ➕", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
         ],
         [
             InlineKeyboardButton("📢 ᴜᴩᴅᴀᴛᴇ", url=f"https://t.me/{LOG_CHANNEL}" if LOG_CHANNEL else "https://t.me/krishn_bots"),
