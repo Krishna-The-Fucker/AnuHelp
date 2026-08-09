@@ -12,7 +12,7 @@ from pyrogram import Client, filters, idle
 
 from config import (
     API_ID, API_HASH, BOT_TOKEN,
-    LOG_LEVEL, AUTO_CREATE_INDEXES
+    LOG_LEVEL, AUTO_CREATE_INDEXES, LOG_CHANNEL
 )
 
 # 🔐 Security
@@ -67,7 +67,7 @@ app = Client(
 
 
 # ============================================================
-# 🚀 STARTUP TASKS
+# 🚀 STARTUP TASKS (WITH LOG CHANNEL NOTIFICATION 🔥)
 # ============================================================
 
 async def startup():
@@ -80,6 +80,21 @@ async def startup():
     except Exception as e:
         logger.error(f"❌ DB Index error: {e}")
 
+    # 📢 Send Startup Log to LOG_CHANNEL automatically
+    if LOG_CHANNEL:
+        try:
+            bot_info = await app.get_me()
+            startup_message = (
+                f"✅ **ʙᴏᴛ sᴜᴄᴄᴇssꜰᴜʟʟʏ sᴛᴀʀᴛᴇᴅ!**\n\n"
+                f"🤖 **Bot:** @{bot_info.username}\n"
+                f"🆔 **ID:** `{bot_info.id}`\n"
+                f"🚀 **Status:** Online & Ready to Manage Groups!"
+            )
+            await app.send_message(LOG_CHANNEL, startup_message)
+            logger.info("📢 Startup log sent to LOG_CHANNEL successfully!")
+        except Exception as err:
+            logger.error(f"❌ Failed to send log to LOG_CHANNEL: {err}")
+
     logger.info("🚀 Bot fully started!")
 
 
@@ -91,12 +106,18 @@ async def shutdown():
     logger.warning("🛑 Shutting down bot...")
 
     try:
+        if LOG_CHANNEL:
+            await app.send_message(LOG_CHANNEL, "⚠️ **ʙᴏᴛ ɪs sʜᴜᴛᴛɪɴɢ ᴅᴏᴡɴ...**")
+    except Exception:
+        pass
+
+    try:
         await app.stop()
     except Exception:
         pass
 
     gc.collect()  # 🔥 memory cleanup
-    logger.info("✅ Bot stopped safely")
+    logger.info("✅ ᴀɴᴜ ᴜʟᴛɪᴍᴀᴛᴇ ʙᴏᴛ stopped safely")
 
 
 # ============================================================
@@ -175,8 +196,7 @@ if __name__ == "__main__":
 
     print("""
 ╔══════════════════════════════╗
-║   🤖 GROUP MANAGER BOT      ║
-║   🔥 ULTRA PRO MAX ACTIVE   ║
+║   🤖 ᴀɴᴜ ᴜʟɪᴍᴀᴛᴇ ʙᴏᴛ ꜱᴛᴀʀᴛ 🪄        ║
 ╚══════════════════════════════╝
 """)
 
