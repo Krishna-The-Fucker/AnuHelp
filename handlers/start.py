@@ -4,7 +4,7 @@
 
 from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
-from config import BOT_USERNAME, START_VIDEO_URL, SUPPORT_CHAT, LOG_CHANNEL, OWNER_ID
+from config import BOT_USERNAME, START_VIDEO_URL, SUPPORT_CHAT, UPDATE_CHANNEL, OWNER_ID
 from db import add_user
 
 # ============================================================
