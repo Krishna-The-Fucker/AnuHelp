@@ -158,7 +158,7 @@ async def start_back_callback(client, callback_query: CallbackQuery):
         f"• 🤖 **ᴀɪ ᴄʜᴀᴛʙᴏᴛ** & 85+ ᴀᴅᴠᴀɴᴄᴇᴅ ᴍᴏᴅᴜʟᴇꜱ\n\n"
         f"👉 **ᴀᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ꜱᴜᴘᴇʀɢʀᴏᴜᴘ ᴀɴᴅ ᴘʀᴏᴍᴏᴛᴇ ᴍᴇ ᴀꜱ ᴀᴅᴍɪɴ ᴛᴏ ʟᴇᴛ ᴍᴇ ɢᴇᴛ ɪɴ ᴀᴄᴛɪᴏɴ!**\n\n"
         f"❓ **ᴡʜɪᴄʜ ᴀʀᴇ ᴛʜᴇ ᴄᴏᴍᴍᴀɴᴅꜱ?**\n"
-        f"ᴘʀᴇꜱꜱ /help ᴛᴏ ꜱᴇᴇ ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅꜱ ᴀɴᴅ ʜᴏᴡ ᴛʜᴇʏ ᴡᴏʀᴋ!"
+        f"ᴘʀᴇꜱꜱ /help ᴛᴏ ꜱᴇᴇ ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅꜱ ᴀɴْد ʜᴏᴡ ᴛʜᴇʏ ᴡᴏʀᴋ!"
     )
     keyboard = InlineKeyboardMarkup([
         [
@@ -191,3 +191,10 @@ async def start_back_callback(client, callback_query: CallbackQuery):
     except Exception:
         pass
     await callback_query.answer()
+
+# ============================================================
+# 🔌 LOADER HOOK FOR AUTO-DISCOVERY
+# ============================================================
+
+def register_start(app, db, LOG_CHANNEL=None):
+    pass
