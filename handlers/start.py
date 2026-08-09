@@ -1,5 +1,5 @@
 # ============================================================
-# 🚀 START & HELP MODULE (WITH OWNER BUTTON)
+# 🚀 START & (WITH OWNER BUTTON)
 # ============================================================
 
 from pyrogram import filters
