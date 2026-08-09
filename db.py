@@ -15,7 +15,7 @@ logger = logging.getLogger("DB")
 # ============================================================
 
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URI)
-db = client[DB_NAME]
+db = client[AnuHelp]
 
 logger.info("✅ MongoDB Connected")
 
