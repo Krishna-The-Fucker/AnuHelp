@@ -175,7 +175,10 @@ async def main():
             logger.info("🤖 Bot is running...")
 
             await asyncio.wait(
-                [idle(), stop_event.wait()],
+                [
+                    asyncio.create_task(idle()),
+                    asyncio.create_task(stop_event.wait())
+                ],
                 return_when=asyncio.FIRST_COMPLETED
             )
 
