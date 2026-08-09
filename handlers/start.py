@@ -37,7 +37,7 @@ async def start_handler(client, message: Message):
             InlineKeyboardButton("➕ ᴀᴅᴅ ᴍᴇ ʏᴏᴜʀ ɢʀᴏᴜᴩ ➕", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
         ],
         [
-            InlineKeyboardButton("📢 ᴜᴩᴅᴀᴛᴇ", url=f"https://t.me/{LOG_CHANNEL}" if LOG_CHANNEL else "https://t.me/krishna_bots"),
+            InlineKeyboardButton("📢 ᴜᴩᴅᴀᴛᴇ", url=f"https://t.me/{UPDATE_CHANNEL}" if LOG_CHANNEL else "https://t.me/krishna_bots"),
             InlineKeyboardButton("💬 ꜱᴜᴩᴩσʀᴛ", url=f"https://t.me/{SUPPORT_CHAT}" if SUPPORT_CHAT else "https://t.me/+MoDgQrl3Cn0yNDRk")
         ],
         [
@@ -144,7 +144,7 @@ async def start_back_callback(client, callback_query: CallbackQuery):
             InlineKeyboardButton("➕ ᴀᴅᴅ ᴍᴇ ʏᴏᴜʀ ɢʀᴏᴜᴩ ➕", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
         ],
         [
-            InlineKeyboardButton("📢 ᴜᴩᴅᴀᴛᴇ", url=f"https://t.me/{LOG_CHANNEL}" if LOG_CHANNEL else "https://t.me/krishn_bots"),
+            InlineKeyboardButton("📢 ᴜᴩᴅᴀᴛᴇ", url=f"https://t.me/{UPDATE_CHANNEL}" if LOG_CHANNEL else "https://t.me/krishn_bots"),
             InlineKeyboardButton("💬 ꜱᴜᴩᴩσʀᴛ", url=f"https://t.me/{SUPPORT_CHAT}" if SUPPORT_CHAT else "https://t.me/+MoDgQrl3Cn0yNDRk")
         ],
         [
