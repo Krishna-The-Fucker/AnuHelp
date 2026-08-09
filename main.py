@@ -111,7 +111,8 @@ async def shutdown():
         pass
 
     try:
-        await app.stop()
+        if app.is_connected:
+            await app.stop()
     except Exception:
         pass
 
@@ -165,7 +166,10 @@ async def main():
         try:
             logger.info("🚀 Starting bot session...")
 
-            await app.start()
+            # Check karein ki client already connected toh nahi hai
+            if not app.is_connected:
+                await app.start()
+                
             await startup()
 
             logger.info("🤖 Bot is running...")
