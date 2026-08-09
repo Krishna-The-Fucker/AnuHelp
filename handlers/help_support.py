@@ -35,89 +35,89 @@ def register_support_system(app, db, SUPPORT_CHAT: int, ADMINS: list):
         return f"TKT-{random.randint(1000, 9999)}"
 
     # ============================================================
-    # 📋 85+ MODULES HELP TEXTS & USAGE (STYLISH FONT FORMATTED)
+    # 📋 85+ MODULES FULL DETAILED COMMANDS & USAGE
     # ============================================================
     HELP_TEXTS = {
-        "ᴀʙᴜꜱᴇ": "🛡️ **Abuse Control**\n\n• **Usage:** Automatically filters or restricts abusive words and slang in chats.",
-        "ᴀᴅᴍɪɴ": "👑 **Admin Tools**\n\n• **Usage:** Essential commands for group management.\n• **Commands:** `/ban`, `/unban`, `/promote`, `/demote`",
-        "ᴀꜰᴋ": "💤 **AFK Module**\n\n• **Usage:** Let others know you are away.\n• **Command:** `/afk [reason]`",
+        "ᴀʙᴜꜱᴇ": "🛡️ **Abuse Control**\n\n• **Usage:** Automatically filters or restricts abusive words and slang in chats.\n• **Commands:** Auto-filters bad words.",
+        "ᴀᴅᴍɪɴ": "👑 **Admin Tools**\n\n• **Usage:** Essential commands for group management.\n• **Commands:** `/ban`, `/unban`, `/mute`, `/unmute`, `/promote`, `/demote`, `/pin`, `/unpin`",
+        "ᴀꜰᴋ": "💤 **AFK Module**\n\n• **Usage:** Let others know you are away when they tag you.\n• **Command:** `/afk [reason]`",
         "ᴀɴɪqᴜᴏᴛᴇ": "📜 **Anime Quotes**\n\n• **Usage:** Fetches random motivational or famous anime quotes.\n• **Command:** `/aniquote`",
-        "ᴀɴᴛɪ-ʙɪᴏʟɪɴᴋ": "🔗 **Anti-Bio Link**\n\n• **Usage:** Restricts users from putting links in their profile bio.",
-        "ᴀɴᴛɪ-ᴇᴅɪᴛᴇ": "✏️ **Anti-Edit Tracker**\n\n• **Usage:** Detects and logs when a user edits their message.",
-        "ᴀɴᴛɪ-ꜰʟᴏᴏᴅ": "🌊 **Anti-Flood System**\n\n• **Usage:** Prevents continuous message spamming by a user.",
-        "ᴀɴᴛɪ-ᴩʀᴏɴ": "🔞 **Anti-Pron / NSFW**\n\n• **Usage:** Automatically detects and removes NSFW or adult media.",
-        "ᴀɴᴛɪ-ʀᴀɪᴅ": "🛡️ **Anti-Raid Protection**\n\n• **Usage:** Protects group from sudden mass bot/user attacks.",
-        "ᴀᴩᴩʀᴏᴠᴇ": "✅ **Approval System**\n\n• **Usage:** Approves trusted users to bypass certain chat restrictions.\n• **Command:** `/approve`",
-        "ᴀᴜᴛᴏ-ꜱᴩᴀᴍ": "🤖 **Auto Spam Detection**\n\n• **Usage:** AI-based automatic detection of spam messages.",
-        "ᴀᴜᴛᴏ-ᴅᴇʟ": "🗑️ **Auto Delete**\n\n• **Usage:** Automatically deletes service or specific command messages after a set time.",
+        "ᴀɴᴛɪ-ʙɪᴏʟɪɴᴋ": "🔗 **Anti-Bio Link**\n\n• **Usage:** Restricts users from putting website/telegram links in their profile bio.",
+        "ᴀɴᴛɪ-ᴇᴅɪᴛᴇ": "✏️ **Anti-Edit Tracker**\n\n• **Usage:** Detects and logs when a user edits their message in chat.",
+        "ᴀɴᴛɪ-ꜰʟᴏᴏᴅ": "🌊 **Anti-Flood System**\n\n• **Usage:** Prevents continuous message spamming by a single user automatically.",
+        "ᴀɴᴛɪ-ᴩʀᴏɴ": "🔞 **Anti-Pron / NSFW**\n\n• **Usage:** Automatically detects and removes NSFW or adult media contents.",
+        "ᴀɴᴛɪ-ʀᴀɪᴅ": "🛡️ **Anti-Raid Protection**\n\n• **Usage:** Protects group from sudden mass bot/user attacks by locking chat.",
+        "ᴀᴩᴩʀᴏᴠᴇ": "✅ **Approval System**\n\n• **Usage:** Approves trusted users to bypass certain chat restrictions.\n• **Commands:** `/approve`, `/unapprove`",
+        "ᴀᴜᴛᴏ-ꜱᴩᴀᴍ": "🤖 **Auto Spam Detection**\n\n• **Usage:** AI-based automatic detection and punishment of spam messages.",
+        "ᴀᴜᴛᴏ-ᴅᴇʟ": "🗑️ **Auto Delete**\n\n• **Usage:** Automatically deletes service or specific command messages after a set time.\n• **Command:** `/autodel [time]`",
         "ʙᴀᴄᴋᴜᴩꜱ": "💾 **Backups Manager**\n\n• **Usage:** Takes backup of database and chat settings.\n• **Command:** `/backup`",
-        "ʙᴀɴ-ᴀʟʟ": "⚠️ **Ban All (Sudo)**\n\n• **Usage:** Mass ban utility for emergency situations (Sudo only).",
+        "ʙᴀɴ-ᴀʟʟ": "⚠️ **Ban All (Sudo)**\n\n• **Usage:** Mass ban utility for emergency situations (Sudo users only).\n• **Command:** `/banall`",
         "ʙʟ-ᴄʜᴀᴛ": "🚫 **Blacklist Chat**\n\n• **Usage:** Restricts bot usage in unauthorized or blacklisted groups.",
-        "ʙʟ-ᴜꜱᴇʀ": "🚷 **Blacklist User**\n\n• **Usage:** Globally blacklists misbehaving users from the bot.",
-        "ʙʟᴏᴄᴋʟɪꜱᴛ": "📋 **Word Blacklist**\n\n• **Usage:** Adds specific words to the group's auto-delete/warn list.",
-        "ʙʟᴏᴄᴋʟɪꜱᴛ-ᴜꜱᴇʀ": "👤🚫 **Blacklist User Module**\n\n• **Usage:** Manages restricted user database.",
-        "ʙʀᴏᴀᴅᴄᴀᴛ": "📢 **Broadcast System**\n\n• **Usage:** Sends announcements to all users or chats.\n• **Command:** `/broadcast [text]`",
-        "ᴄᴀᴩᴛᴄʜᴀ": "🧩 **Captcha Verification**\n\n• **Usage:** Verifies new members with buttons/math to stop bots.",
-        "ᴄʜᴀᴛʙᴏᴛ": "🤖 **AI Chatbot**\n\n• **Usage:** Intelligent conversational bot feature.",
-        "ᴄʟᴇᴀɴ-ꜱᴇʀᴠᴜᴄᴇ": "🧹 **Clean Service Messages**\n\n• **Usage:** Automatically deletes 'user joined/left' join logs.",
-        "ᴄʟᴇᴀɴᴇʀ": "🧽 **Cleaner Tool**\n\n• **Usage:** Cleans up old cache and temporary files.",
+        "ʙʟ-ᴜꜱᴇʀ": "🚷 **Blacklist User**\n\n• **Usage:** Globally blacklists misbehaving users from accessing the bot.\n• **Command:** `/bluser [id]`",
+        "ʙʟᴏᴄᴋʟɪꜱᴛ": "📋 **Word Blacklist**\n\n• **Usage:** Adds specific words to the group's auto-delete/warn list.\n• **Commands:** `/blacklist`, `/addbl [word]`, `/rmbl [word]`",
+        "ʙʟᴏᴄᴋʟɪꜱᴛ-ᴜꜱᴇʀ": "👤🚫 **Blacklist User Module**\n\n• **Usage:** Manages restricted user database across chats.",
+        "ʙʀᴏᴀᴅᴄᴀᴛ": "📢 **Broadcast System**\n\n• **Usage:** Sends announcements to all registered users or chats.\n• **Command:** `/broadcast [text]`",
+        "ᴄᴀᴩᴛᴄʜᴀ": "🧩 **Captcha Verification**\n\n• **Usage:** Verifies new members with buttons or math puzzles to stop bots.",
+        "ᴄʜᴀᴛʙᴏᴛ": "🤖 **AI Chatbot**\n\n• **Usage:** Intelligent conversational AI bot feature for groups.",
+        "ᴄʟᴇᴀɴ-ꜱᴇʀᴠᴜᴄᴇ": "🧹 **Clean Service Messages**\n\n• **Usage:** Automatically deletes 'user joined/left' service logs to keep chat clean.",
+        "ᴄʟᴇᴀɴᴇʀ": "🧽 **Cleaner Tool**\n\n• **Usage:** Cleans up old cache and temporary database files.",
         "ᴄᴏɴɴᴇᴄᴛɪᴏɴ": "🔗 **Chat Connections**\n\n• **Usage:** Connects group to remote plugins/databases.\n• **Command:** `/connect`",
-        "ᴄᴏᴜᴩʟᴇ-ɢᴀᴍᴇꜱ": "💞 **Couples Game**\n\n• **Usage:** Finds a random cute couple of the day.\n• **Command:** `/couple`",
-        "ᴄᴜʀʀᴇɴᴄʏ-ᴄᴏɴᴠᴇʀᴛᴇʀ": "💱 **Currency Converter**\n\n• **Usage:** Converts currency rates in real time.\n• **Command:** `/convert [amount] [from] [to]`",
-        "ᴄᴜꜱᴛ-ꜰɪʟᴛᴇʀꜱ": "⚡ **Custom Filters**\n\n• **Usage:** Saves custom automated replies for keywords.",
+        "ᴄᴏᴜᴩʟᴇ-ɢᴀᴍᴇꜱ": "💞 **Couples Game**\n\n• **Usage:** Finds a random cute couple of the day in your group.\n• **Command:** `/couple`",
+        "ᴄᴜʀʀᴇɴᴄʏ-ᴄᴏɴᴠᴇʀᴛᴇʀ": "💱 **Currency Converter**\n\n• **Usage:** Converts currency rates in real-time.\n• **Command:** `/convert [amount] [from] [to]`",
+        "ᴄᴜꜱᴛ-ꜰɪʟᴛᴇʀꜱ": "⚡ **Custom Filters**\n\n• **Usage:** Saves custom automated replies for specific keywords.\n• **Commands:** `/filter`, `/filters`, `/stop`",
         "ᴅʙ-ᴄʟᴇᴀɴ": "🗄️ **Database Cleaner**\n\n• **Usage:** Clears inactive chats and dead users from database.",
-        "ᴅᴇʙᴜɢ": "🛠️ **Debug Logs**\n\n• **Usage:** Developer tool to check error traces.",
-        "ᴅᴇᴠ": "👨‍💻 **Developer Utilities**\n\n• **Usage:** Special commands for bot owners.",
-        "ᴅɪꜱᴀʙʟᴇ": "🔕 **Disable Commands**\n\n• **Usage:** Disables specific commands in a group.\n• **Command:** `/disable [cmd]`",
-        "ᴅʀᴀᴡ": "🎨 **Image Draw / AI Art**\n\n• **Usage:** Generates images from text prompts.",
-        "ᴇᴄᴏɴᴏᴍʏ-ɢᴀᴍᴇꜱ": "💰 **Economy System**\n\n• **Usage:** Virtual currency and wallet management.\n• **Command:** `/balance`, `/daily`",
+        "ᴅᴇʙᴜɢ": "🛠️ **Debug Logs**\n\n• **Usage:** Developer tool to check error traces and performance logs.",
+        "ᴅᴇᴠ": "👨‍💻 **Developer Utilities**\n\n• **Usage:** Special administrative commands exclusively for bot owners.",
+        "ᴅisᴀʙʟᴇ": "🔕 **Disable Commands**\n\n• **Usage:** Disables specific commands in a group.\n• **Command:** `/disable [cmd]`",
+        "ᴅʀᴀᴡ": "🎨 **Image Draw / AI Art**\n\n• **Usage:** Generates stunning AI images from text prompts.\n• **Command:** `/draw [prompt]`",
+        "ᴇᴄᴏɴᴏᴍʏ-ɢᴀᴍᴇꜱ": "💰 **Economy System**\n\n• **Usage:** Virtual currency, wallet management, and daily rewards.\n• **Commands:** `/balance`, `/daily`, `/rob`",
         "ᴇʀʀᴏʀ": "⚠️ **Error Handler**\n\n• **Usage:** Gracefully catches and logs bot runtime exceptions.",
-        "ᴇᴠᴀʟ": "⚡ **Evaluator (Sudo)**\n\n• **Usage:** Executes python code directly on server terminal.",
-        "ꜰᴇᴅ": "🌐 **Federations (Fed Ban)**\n\n• **Usage:** Bans a user across multiple connected groups simultaneously.",
-        "ꜰɪʟᴛᴇʀꜱ": "⚡ **Filters Module**\n\n• **Usage:** Advanced filter handling system.",
+        "ᴇᴠᴀʟ": "⚡ **Evaluator (Sudo)**\n\n• **Usage:** Executes Python code directly on server terminal (Sudo only).",
+        "ꜰᴇᴅ": "🌐 **Federations (Fed Ban)**\n\n• **Usage:** Bans a user across multiple connected groups simultaneously.\n• **Commands:** `/fedcreate`, `/fban`, `/unfban`",
+        "ꜰɪʟᴛᴇʀꜱ": "⚡ **Filters Module**\n\n• **Usage:** Advanced filter handling system for groups.",
         "ꜱᴛʏʟɪꜱʜ-ɴᴀᴍᴇ": "🔤 **Fancy Fonts Generator**\n\n• **Usage:** Converts normal text into stylish cool fonts.\n• **Command:** `/font [text]`",
-        "ꜰᴏʀᴄᴇ-ᴊᴏɪɴ": "📢 **Force Subscribe**\n\n• **Usage:** Forces users to join a channel before chatting in the group.",
-        "ꜰᴜɴ-ɢᴀᴍᴇꜱ": "🎮 **Fun & Entertainment**\n\n• **Usage:** Fun commands and mini interaction tools.",
+        "ꜰᴏʀᴄᴇ-ᴊᴏɪɴ": "📢 **Force Subscribe**\n\n• **Usage:** Forces users to join a channel before chatting in the group.\n• **Command:** `/fsub [channel]`",
+        "ꜰᴜɴ-ɢᴀᴍᴇꜱ": "🎮 **Fun & Entertainment**\n\n• **Usage:** Fun commands and mini interaction tools like dice and dart.\n• **Commands:** `/dice`, `/dart`",
         "ꜰᴜɴ-ꜱᴛʀɪɴɢ": "💬 **Fun Strings**\n\n• **Usage:** Stores hilarious dialogues and responses.",
-        "ᴀꜱᴋ": "✨ **Google Gemini AI**\n\n• **Usage:** Chat with Gemini AI directly.\n• **Command:** `/gemini [query]`",
-        "ᴄᴏᴍᴍᴏɴ-ᴄʜᴀᴛꜱ": "👥 **Common Chats**\n\n• **Usage:** Finds groups shared between bot and user.",
-        "ɢᴀᴛ-ᴛɪᴍᴇ": "⏰ **Time Utility**\n\n• **Usage:** Shows current time across different timezones.",
+        "ᴀꜱᴋ": "✨ **Google Gemini AI**\n\n• **Usage:** Chat with Gemini AI directly inside chat.\n• **Command:** `/gemini [query]` or `/ask`",
+        "ᴄᴏᴍᴍᴏɴ-ᴄʜᴀᴛꜱ": "👥 **Common Chats**\n\n• **Usage:** Finds groups shared between the bot and a user.",
+        "ɢᴀᴛ-ᴛɪᴍᴇ": "⏰ **Time Utility**\n\n• **Usage:** Shows current time across different global timezones.",
         "ɢɪꜰ": "🎞️ **GIF Search**\n\n• **Usage:** Searches and sends cool GIFs.\n• **Command:** `/gif [query]`",
-        "ɢɪᴛʜᴜʙ": "🐙 **GitHub Uploader**\n\n• **Usage:** Uploads files or logs directly to GitHub repositories.",
-        "ɢʀᴏᴜᴩ-ᴍᴀɴᴀɢᴇᴍᴇɴᴛ": "👥 **Group Management**\n\n• **Usage:** Core settings and configuration for groups.",
-        "ʜᴀᴄᴋᴇʀ-ɢᴀᴍᴇ": "💻 **Hacker Game**\n\n• **Usage:** Interactive simulated hacking mini-game",
-        "ʟᴀɴɢuᴀɢᴇ": "🌐 **Language Settings**\n\n• **Usage:** Changes bot language preferences for chats.",
-        "ʟᴏᴄᴋꜱ": "🔒 **Chat Locks**\n\n• **Usage:** Locks links, stickers, media types.\n• **Command:** `/lock [type]`",
-        "ʟᴏɢᴏ-ᴍᴀᴋᴇʀ": "🖼️ **Logo Maker**\n\n• **Usage:** Creates custom name logos on banners.\n• **Command:** `/logo [text]`",
-        "mᴀꜰɪʏᴀ-ɢᴀᴍᴇ": "🕵️ **Mafia Game**\n\n• **Usage:** Interactive group Mafia/Murder mystery game.",
-        "ᴍᴇᴍɪꜰʏ": "memify: 🖼️ **Memify Tool**\n\n• **Usage:** Adds text to top of stickers or images.\n• **Command:** `/mm` or reply to media.",
+        "ɢɪᴛʜᴜʙ": "🐙 **GitHub Uploader**\n\n• **Usage:** Uploads files or logs directly to GitHub repositories.\n• **Command:** `/github`",
+        "ɢʀᴏᴜᴩ-ᴍᴀɴᴀɢᴇᴍᴇɴᴛ": "👥 **Group Management**\n\n• **Usage:** Core settings and configuration tools for groups.",
+        "ʜᴀᴄᴋᴇʀ-ɢᴀᴍᴇ": "💻 **Hacker Game**\n\n• **Usage:** Interactive simulated hacking mini-game to hack friends.\n• **Command:** `/hack [user]`",
+        "ʟᴀɴɢuᴀɢᴇ": "🌐 **Language Settings**\n\n• **Usage:** Changes bot language preferences for chats.\n• **Command:** `/lang [code]`",
+        "ʟᴏᴄᴋꜱ": "🔒 **Chat Locks**\n\n• **Usage:** Locks links, stickers, media types in chats.\n• **Commands:** `/lock [type]`, `/unlock [type]`",
+        "ʟᴏɢᴏ-ᴍᴀᴋᴇʀ": "🖼️ **Logo Maker**\n\n• **Usage:** Creates custom name logos on attractive banners.\n• **Command:** `/logo [text]`",
+        "mᴀꜰɪʏᴀ-ɢᴀᴍᴇ": "🕵️ **Mafia Game**\n\n• **Usage:** Interactive group Mafia/Murder mystery roleplay game.\n• **Command:** `/mafia`",
+        "ᴍᴇᴍɪꜰʏ": "🖼️ **Memify Tool**\n\n• **Usage:** Adds custom text to top of stickers or images.\n• **Command:** `/mm` (reply to media)",
         "ᴍɪꜱᴄᴇ": "🛠️ **Miscellaneous**\n\n• **Usage:** Extra utility tools and helpers.",
-        "ɴɪɢʜᴛ-ᴍᴏᴅᴇ": "🌙 **Night Mode**\n\n• **Usage:** Automatically closes group during night hours.",
-        "ɴᴏᴛᴇꜱ": "📝 **Saved Notes**\n\n• **Usage:** Saves important notes and documentation.\n• **Command:** `/save [name]` / `#[name]`",
-        "ᴩɪɴꜱ": "📌 **Pin Management**\n\n• **Usage:** Advanced pinned messages controller.",
-        "ᴩᴜʀɢᴇ": "🗑️ **Purge Messages**\n\n• **Usage:** Deletes bulk messages instantly.\n• **Command:** `/purge`",
-        "𝚀ᴜɪᴄᴋ-ɢᴀᴍᴇꜱ": "🎯 **Quick Games**\n\n• **Usage:** Fast mini games like dice, dart, etc.",
-        "ʀᴇᴀᴄᴛɪᴏɴ": "❤️ **Auto Reactions**\n\n• **Usage:** Reacts automatically to specific chat ʀᴇᴀᴄᴛᴛɪᴏɴ",
+        "ɴɪɢʜᴛ-ᴍᴏᴅᴇ": "🌙 **Night Mode**\n\n• **Usage:** Automatically closes/locks group during night hours.\n• **Command:** `/nightmode [on/off]`",
+        "ɴᴏᴛᴇꜱ": "📝 **Saved Notes**\n\n• **Usage:** Saves important notes and documentation in chat.\n• **Commands:** `/save [name]`, `/notes`, `#[name]`",
+        "ᴩɪɴꜱ": "📌 **Pin Management**\n\n• **Usage:** Advanced pinned messages controller.\n• **Command:** `/pin`",
+        "ᴩᴜʀɢᴇ": "🗑️ **Purge Messages**\n\n• **Usage:** Deletes bulk messages instantly from chat.\n• **Command:** `/purge` or `/del`",
+        "𝚀ᴜɪᴄᴋ-ɢᴀᴍᴇꜱ": "🎯 **Quick Games**\n\n• **Usage:** Fast mini games like truth and dare.\n• **Commands:** `/truth`, `/dare`",
+        "ʀᴇᴀᴄᴛɪᴏɴ": "❤️ **Auto Reactions**\n\n• **Usage:** Reacts automatically to specific chat keywords.",
         "ʀᴇᴩᴏʀᴛɪɴɢ": "🚨 **Admin Reporting**\n\n• **Usage:** Reports message to admins using `@admin` tag.",
-        "ʀᴜʟᴇꜱ": "📜 **Chat Rules**\n\n• **Usage:** Displays guidelines of the group.\n• **Command:** `/rules`",
-        "ꜱᴇᴅ": "🔤 **Sed Replacement**\n\n• **Usage:** Replaces typos using s/old/new format.",
-        "ꜱʜᴇʟʟ": "💻 **Terminal Shell**\n\n• **Usage:** Executes linux shell commands (Sudo).",
-        "ꜱᴏᴜʀᴄᴇ": "📦 **Source Code**\n\n• **Usage:** Shows GitHub repository link of the bot.",
-        "ꜱᴛɪᴄᴋᴇʀs": "🎨 **Sticker Tools**\n\n• **Usage:** Converts images/emojis to stickers pack.",
-        "ꜱᴛɪɴɢ-ɢᴇɴ": "🪡 **String Session Gen**\n\n• **Usage:** Generates Pyrogram/Telethon string sessions.",
-        "ꜱᴜᴅᴏ": "⚡ **Sudo Controls**\n\n• **Usage:** Bot administrator controls.",
-        "ᴛᴀɢ-ᴀʟʟ": "📢 **Tag All Members**\n\n• **Usage:** Mentions all members in a group.\n• **Command:** `/tagall [text]`",
-        "ᴛᴇʟᴇɢᴀʀᴀᴩʜ": "🌐 **Telegraph Maker**\n\n• **Usage:** Uploads text/media to telegraph link.",
-        "ᴛʀᴜᴛʜ-&-ᴅᴀʀᴇ": "🎯 **Truth & Dare**\n\n• **Usage:** Plays fun truth or dare questions.\n• **Command:** `/truth` / `/dare`",
+        "ʀᴜʟᴇꜱ": "📜 **Chat Rules**\n\n• **Usage:** Displays guidelines and rules of the group.\n• **Command:** `/rules`",
+        "ꜱᴇᴅ": "🔤 **Sed Replacement**\n\n• **Usage:** Replaces typos using s/old/new format instantly.",
+        "ꜱʜᴇʟʟ": "💻 **Terminal Shell**\n\n• **Usage:** Executes linux shell commands on server (Sudo only).",
+        "ꜱᴏᴜʀᴄᴇ": "📦 **Source Code**\n\n• **Usage:** Shows GitHub repository link of the bot.\n• **Command:** `/source`",
+        "ꜱᴛɪᴄᴋᴇʀs": "🎨 **Sticker Tools**\n\n• **Usage:** Converts images/emojis to custom sticker packs.\n• **Command:** `/kang`",
+        "ꜱᴛɪɴɢ-ɢᴇɴ": "🪡 **String Session Gen**\n\n• **Usage:** Generates Pyrogram/Telethon userbot string sessions.\n• **Command:** `/string`",
+        "ꜱᴜᴅᴏ": "⚡ **Sudo Controls**\n\n• **Usage:** Bot administrator and elevated permission controls.",
+        "ᴛᴀɢ-ᴀʟʟ": "📢 **Tag All Members**\n\n• **Usage:** Mentions all group members in one go.\n• **Commands:** `/tagall [text]`, `/cancel`",
+        "ᴛᴇʟᴇɢᴀʀᴀᴩʜ": "🌐 **Telegraph Maker**\n\n• **Usage:** Uploads text or media directly to a telegraph link.\n• **Command:** `/tgm`",
+        "ᴛʀᴜᴛʜ-&-ᴅᴀʀᴇ": "🎯 **Truth & Dare**\n\n• **Usage:** Plays fun truth or dare interactive questions.\n• **Commands:** `/truth`, `/dare`",
         "ᴜᴅ": "📖 **Urban Dictionary**\n\n• **Usage:** Searches slang meanings on Urban Dictionary.\n• **Command:** `/ud [word]`",
-        "underworld_game": "🎲 **Underworld Game**\n\n• **Usage:** Interactive mafia roleplay game.",
-        "ᴜꜱᴇʀ": "👤 **User Info**\n\n• **Usage:** Fetches profile info of users.",
-        "ᴜꜱᴇʀɪɴꜰᴏ": "ℹ️ **Detailed User Info**\n\n• **Usage:** Extended user profile tracking module.",
-        "ᴡᴀʀɴ": "⚠️ **Warning System**\n\n• **Usage:** Warns users; bans upon reaching limit.\n• **Command:** `/warn`",
-        "ᴡᴇʟᴄᴏᴍᴇ": "👋 **Welcome Greeter**\n\n• **Usage:** Sends custom greeting cards to newcomers.",
-        "ᴡɪᴋɪ": "📚 **Wikipedia Search**\n\n• **Usage:** Searches Wikipedia articles.\n• **Command:** `/wiki [query]`",
-        "ᴡʀɪᴛᴇ": "✍️ **Handwriting Writer**\n\n• **Usage:** Converts text into realistic handwriting.\n• **Command:** `/write [text]`",
-        "ᴢɪᴩ": "🗜️ **Zip Compressor**\n\n• **Usage:** Compresses or extracts zip archives."
+        "underworld_game": "🎲 **Underworld Game**\n\n• **Usage:** Interactive underworld mafia roleplay game.",
+        "ᴜꜱᴇʀ": "👤 **User Info**\n\n• **Usage:** Fetches basic profile info of users.\n• **Command:** `/id`",
+        "ᴜꜱᴇʀɪɴꜰᴏ": "ℹ️ **Detailed User Info**\n\n• **Usage:** Extended user profile tracking and history module.\n• **Command:** `/info`",
+        "ᴡᴀʀɴ": "⚠️ **Warning System**\n\n• **Usage:** Warns users; auto-bans or mutes upon reaching limit.\n• **Commands:** `/warn`, `/unwarn`, `/warns`",
+        "ᴡᴇʟᴄᴏᴍᴇ": "👋 **Welcome Greeter**\n\n• **Usage:** Sends custom greeting cards to newcomers.\n• **Commands:** `/setwelcome`, `/welcome`",
+        "ᴡɪᴋɪ": "📚 **Wikipedia Search**\n\n• **Usage:** Searches Wikipedia articles directly in chat.\n• **Command:** `/wiki [query]`",
+        "ᴡʀɪᴛᴇ": "✍️ **Handwriting Writer**\n\n• **Usage:** Converts text into realistic handwritten pages.\n• **Command:** `/write [text]`",
+        "ᴢɪᴩ": "🗜️ **Zip Compressor**\n\n• **Usage:** Compresses or extracts zip archives easily.\n• **Commands:** `/zip`, `/unzip`"
     }
 
     # ============================================================
@@ -127,7 +127,6 @@ def register_support_system(app, db, SUPPORT_CHAT: int, ADMINS: list):
         keys = list(HELP_TEXTS.keys())
         total_items = len(keys)
         
-        # Divided precisely into 6 parts/pages
         per_page = (total_items + 5) // 6 
         if per_page < 1:
             per_page = 1
@@ -139,9 +138,8 @@ def register_support_system(app, db, SUPPORT_CHAT: int, ADMINS: list):
         keyboard = []
         row = []
         for k in current_keys:
-            # Stylish small caps formatting for button text using the given font style
             display_name = "".join([
-                {"a": "ᴀ", "b": "ʙ", "c": "ᴄ", "d": "ᴅ", "e": "ᴇ", "f": "ꜰ", "g": "ɢ", "h": "ʜ", "i": "ɪ", "j": "ᴊ", "k": "ᴋ", "l": "ʟ", "m": "ᴍ", "n": "ɴ", "o": "ᴏ", "p": "ᴘ", "q": "ǫ", "r": "ʀ", "s": "ꜱ", "t": "ᴛ", "u": "ᴜ", "v": "ᴠ", "w": "ᴡ", "x": "𝗡" if False else "x", "y": "ʏ", "z": "ᴢ", "_": " "}.get(c, c)
+                {"a": "ᴀ", "b": "ʙ", "c": "ᴄ", "d": "ᴅ", "e": "ᴇ", "f": "ꜰ", "g": "ɢ", "h": "ʜ", "i": "ɪ", "j": "ᴊ", "k": "ᴋ", "l": "ʟ", "m": "ᴍ", "n": "ɴ", "o": "ᴏ", "p": "ᴘ", "q": "ǫ", "r": "ʀ", "s": "ꜱ", "t": "ᴛ", "u": "ᴜ", "v": "ᴠ", "w": "ᴡ", "x": "x", "y": "ʏ", "z": "ᴢ", "_": " "}.get(c, c)
                 for c in k.replace("_", " ").lower()
             ]).title()
 
@@ -152,7 +150,6 @@ def register_support_system(app, db, SUPPORT_CHAT: int, ADMINS: list):
         if row:
             keyboard.append(row)
 
-        # Pagination Navigation Buttons (Back, Home, Next)
         nav_buttons = []
         total_pages = 6
         
@@ -304,4 +301,4 @@ def register_support_system(app, db, SUPPORT_CHAT: int, ADMINS: list):
                 await client.send_message(user_id, f"❌ **Your ticket `{ticket_id}` was closed.**")
             except Exception:
                 pass
-        await callback.answer("Closed ✅")
+        await callback.answer("ᴄʟᴏꜱᴇ ⚡")
