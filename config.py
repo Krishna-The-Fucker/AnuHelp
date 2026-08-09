@@ -49,7 +49,7 @@ IGNORE_SUDO = os.getenv("IGNORE_SUDO", "True") == "True"
 # ============================================================
 
 SUPPORT_CHAT = int(os.getenv("SUPPORT_CHAT", "https://t.me/+MoDgQrl3Cn0yNDRk"))
-LOG_CHANNEL = int(os.getenv("LOG_CHANNEL", "0"))
+LOG_CHANNEL = int(os.getenv("LOG_CHANNEL", "-1004434355555"))
 
 # 📢 UPDATE CHANNEL (ADDED 🔥)
 UPDATE_CHANNEL = os.getenv("UPDATE_CHANNEL", "https://t.me/KRISHNA_BOTS")
