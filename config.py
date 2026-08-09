@@ -48,21 +48,32 @@ IGNORE_SUDO = os.getenv("IGNORE_SUDO", "True") == "True"
 # 📢 CHANNEL / LOGS & STARTUP MEDIA
 # ============================================================
 
-SUPPORT_CHAT = int(os.getenv("SUPPORT_CHAT", "https://t.me/+MoDgQrl3Cn0yNDRk"))
-LOG_CHANNEL = int(os.getenv("LOG_CHANNEL", "-1004434355555"))
+# SAFE LOADING FOR CHANNELS
+try:
+    SUPPORT_CHAT = int(os.getenv("SUPPORT_CHAT", "0"))
+except ValueError:
+    SUPPORT_CHAT = os.getenv("SUPPORT_CHAT", "https://t.me/+MoDgQrl3Cn0yNDRk")
 
-# 📢 UPDATE CHANNEL (ADDED 🔥)
+try:
+    LOG_CHANNEL = int(os.getenv("LOG_CHANNEL", "-1004434355555"))
+except ValueError:
+    LOG_CHANNEL = os.getenv("LOG_CHANNEL", "-1004434355555")
+
+# 📢 UPDATE CHANNEL
 UPDATE_CHANNEL = os.getenv("UPDATE_CHANNEL", "https://t.me/KRISHNA_BOTS")
-
 START_VIDEO_URL = os.getenv("START_VIDEO_URL", "https://n.uguu.se/nQlDgtaT.mp4")
+
+# ============================================================
+# ... (Baaki saara code waisa hi rahega)
+# ============================================================
 
 # ============================================================
 # ⚠️ WARN SYSTEM
 # ============================================================
 
 MAX_WARNS = int(os.getenv("MAX_WARNS", "3"))
-WARN_ACTION = os.getenv("WARN_ACTION", "mute")  # mute/kick/ban
-WARN_RESET_TIME = int(os.getenv("WARN_RESET_TIME", "0"))  # optional
+WARN_ACTION = os.getenv("WARN_ACTION", "mute")
+WARN_RESET_TIME = int(os.getenv("WARN_RESET_TIME", "0"))
 
 # ============================================================
 # 🔞 NSFW SYSTEM
@@ -77,10 +88,10 @@ NSFW_THRESHOLD = float(os.getenv("NSFW_THRESHOLD", "0.7"))
 
 CAPTCHA_DEFAULT = os.getenv("CAPTCHA_DEFAULT", "True") == "True"
 CAPTCHA_TIMEOUT = int(os.getenv("CAPTCHA_TIMEOUT", "120"))
-CAPTCHA_MODE = os.getenv("CAPTCHA_MODE", "math")  # math/button
+CAPTCHA_MODE = os.getenv("CAPTCHA_MODE", "math")
 
 # ============================================================
-# 🚫 ANTIBIOLINK SYSTEM (FULL ADVANCED 🔥)
+# 🚫 ANTIBIOLINK SYSTEM
 # ============================================================
 
 ANTIBIOLINK_DEFAULT = os.getenv("ANTIBIOLINK_DEFAULT", "False") == "True"
@@ -91,18 +102,10 @@ ANTIBIOLINK_PUNISHMENT = os.getenv("ANTIBIOLINK_PUNISHMENT", "mute")
 ANTIBIOLINK_IGNORE_ADMINS = os.getenv("ANTIBIOLINK_IGNORE_ADMINS", "True") == "True"
 ANTIBIOLINK_IGNORE_DEVS = os.getenv("ANTIBIOLINK_IGNORE_DEVS", "True") == "True"
 ANTIBIOLINK_IGNORE_SUDO = os.getenv("ANTIBIOLINK_IGNORE_SUDO", "True") == "True"
-
 ANTIBIOLINK_STRICT_MODE = os.getenv("ANTIBIOLINK_STRICT_MODE", "True") == "True"
 
-WHITELIST_DOMAINS = os.getenv(
-    "WHITELIST_DOMAINS",
-    "t.me,telegram.me,youtube.com,youtu.be"
-).split(",")
-
-BIO_LINK_KEYWORDS = os.getenv(
-    "BIO_LINK_KEYWORDS",
-    "http,www,.com,.net,.org,t.me,telegram,wa.me,instagram"
-).split(",")
+WHITELIST_DOMAINS = os.getenv("WHITELIST_DOMAINS", "t.me,telegram.me,youtube.com,youtu.be").split(",")
+BIO_LINK_KEYWORDS = os.getenv("BIO_LINK_KEYWORDS", "http,www,.com,.net,.org,t.me,telegram,wa.me,instagram").split(",")
 
 DELETE_ON_DETECT = os.getenv("DELETE_ON_DETECT", "True") == "True"
 WARN_ON_DETECT = os.getenv("WARN_ON_DETECT", "True") == "True"
@@ -132,7 +135,7 @@ LOCK_TYPES = [
 AUTO_PIN = os.getenv("AUTO_PIN", "False") == "True"
 
 # ============================================================
-# ⚡ CACHE SYSTEM (DB.py compatible 🔥)
+# ⚡ CACHE SYSTEM
 # ============================================================
 
 CACHE_ENABLED = os.getenv("CACHE_ENABLED", "True") == "True"
@@ -146,68 +149,64 @@ CACHE_LIMIT = int(os.getenv("CACHE_LIMIT", "10000"))
 AUTO_DELETE_TIME = int(os.getenv("AUTO_DELETE_TIME", "0"))
 
 # ============================================================
-# 🌍 LANGUAGE SYSTEM (DB CONNECTED 🔥)
+# 🌍 LANGUAGE SYSTEM
 # ============================================================
 
 DEFAULT_LANGUAGE = os.getenv("DEFAULT_LANGUAGE", "en")
-
 AUTO_TRANSLATE = os.getenv("AUTO_TRANSLATE", "True") == "True"
-TRANSLATE_MODE = os.getenv("TRANSLATE_MODE", "reply")  # reply/replace/off
+TRANSLATE_MODE = os.getenv("TRANSLATE_MODE", "reply")
 TRANSLATE_TIMEOUT = int(os.getenv("TRANSLATE_TIMEOUT", "5"))
 TRANSLATE_RETRIES = int(os.getenv("TRANSLATE_RETRIES", "2"))
-
-IGNORE_COMMANDS_IN_TRANSLATE = os.getenv(
-    "IGNORE_COMMANDS_IN_TRANSLATE", "True"
-) == "True"
+IGNORE_COMMANDS_IN_TRANSLATE = os.getenv("IGNORE_COMMANDS_IN_TRANSLATE", "True") == "True"
 
 # ============================================================
-# 👋 WELCOME SYSTEM CONFIGS
+# 👋 WELCOME SYSTEM
 # ============================================================
 
-WELCOME_DEFAULT_MODE = os.getenv("WELCOME_DEFAULT_MODE", "text") # text/media
+WELCOME_DEFAULT_MODE = os.getenv("WELCOME_DEFAULT_MODE", "text")
 WELCOME_CLEAN_SERVICE = os.getenv("WELCOME_CLEAN_SERVICE", "True") == "True"
 
 # ============================================================
-# 📝 ANI-QUOTE SYSTEM CONFIGS
+# 📝 ANI-QUOTE SYSTEM
 # ============================================================
 
 ANIQUOTE_DEFAULT_LIMIT = int(os.getenv("ANIQUOTE_DEFAULT_LIMIT", "5"))
 
 # ============================================================
-# 🚫 ANTI-EDIT SYSTEM CONFIGS
+# 🚫 ANTI-EDIT SYSTEM
 # ============================================================
 
 ANTI_EDIT_DEFAULT = os.getenv("ANTI_EDIT_DEFAULT", "False") == "True"
 ANTI_EDIT_ALERT_TIMEOUT = int(os.getenv("ANTI_EDIT_ALERT_TIMEOUT", "4"))
 
 # ============================================================
-# 🌐 FEDERATION SYSTEM CONFIGS
+# 🌐 FEDERATION SYSTEM
 # ============================================================
 
 FEDERATION_ENABLED = os.getenv("FEDERATION_ENABLED", "True") == "True"
 MAX_FEDS_PER_USER = int(os.getenv("MAX_FEDS_PER_USER", "1"))
 
 # ============================================================
-# 🚫 BLACKLIST SYSTEM CONFIGS (CHATS & USERS)
+# 🚫 BLACKLIST SYSTEM
 # ============================================================
 
 AUTO_LEAVE_BLACKLIST_CHATS = os.getenv("AUTO_LEAVE_BLACKLIST_CHATS", "True") == "True"
 BLOCK_BLACKLIST_USERS = os.getenv("BLOCK_BLACKLIST_USERS", "True") == "True"
 
 # ============================================================
-# 🧶 STRING GENERATOR SYSTEM CONFIGS
+# 🧶 STRING GENERATOR SYSTEM
 # ============================================================
 
 STRING_GEN_TIMEOUT = int(os.getenv("STRING_GEN_TIMEOUT", "300"))
 
 # ============================================================
-# 🎮 QUICK GAMES SYSTEM CONFIGS
+# 🎮 QUICK GAMES SYSTEM
 # ============================================================
 
 GAMES_ENABLED = os.getenv("GAMES_ENABLED", "True") == "True"
 
 # ============================================================
-# 💳 ECONOMY & BANKING MODULE CONFIGS
+# 💳 ECONOMY & BANKING MODULE
 # ============================================================
 
 ECONOMY_ENABLED = os.getenv("ECONOMY_ENABLED", "True") == "True"
@@ -215,30 +214,24 @@ STARTING_CASH = int(os.getenv("STARTING_CASH", "100000"))
 DAILY_BONUS_AMOUNT = int(os.getenv("DAILY_BONUS_AMOUNT", "300000"))
 
 # ============================================================
-# 🥷 UNDERWORLD / MAFIA & HACKER GAME CONFIGS (ADDED 🔥)
+# 🥷 UNDERWORLD / MAFIA & HACKER GAME
 # ============================================================
 
 UNDERWORLD_ENABLED = os.getenv("UNDERWORLD_ENABLED", "True") == "True"
 MAFIA_GAME_ENABLED = os.getenv("MAFIA_GAME_ENABLED", "True") == "True"
 HACKER_GAME_ENABLED = os.getenv("HACKER_GAME_ENABLED", "True") == "True"
 
-# Game specific configs
 ROB_SUCCESS_CHANCE = float(os.getenv("ROB_SUCCESS_CHANCE", "0.5"))
 MAX_ROB_PERCENT = float(os.getenv("MAX_ROB_PERCENT", "0.3"))
 STARTING_GEMS = int(os.getenv("STARTING_GEMS", "100"))
 HACK_SUCCESS_CHANCE = float(os.getenv("HACK_SUCCESS_CHANCE", "0.6"))
 
 # ============================================================
-# 🧠 SECURITY FLAGS
+# 🧠 SECURITY & DEBUG
 # ============================================================
 
 STRICT_MODE = os.getenv("STRICT_MODE", "True") == "True"
 IGNORE_PRIVATE = os.getenv("IGNORE_PRIVATE", "True") == "True"
-
-# ============================================================
-# 🧠 DEBUG / LOGGING
-# ============================================================
-
 DEBUG = os.getenv("DEBUG", "True") == "True"
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
