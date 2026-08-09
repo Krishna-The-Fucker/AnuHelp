@@ -22,7 +22,7 @@ from security import verify_integrity, get_runtime_key
 from handlers import register_all_handlers
 
 # 🗄️ DB
-from db import create_indexes
+from db import create_indexes, db
 
 
 # ============================================================
@@ -61,13 +61,13 @@ app = Client(
     api_id=API_ID,
     api_hash=API_HASH,
     bot_token=BOT_TOKEN,
-    workers=50,  # 🔥 increased workers
+    workers=50,
     sleep_threshold=20
 )
 
 
 # ============================================================
-# 🚀 STARTUP TASKS (WITH LOG CHANNEL NOTIFICATION 🔥)
+# 🚀 STARTUP TASKS
 # ============================================================
 
 async def startup():
@@ -80,7 +80,6 @@ async def startup():
     except Exception as e:
         logger.error(f"❌ DB Index error: {e}")
 
-    # 📢 Send Startup Log to LOG_CHANNEL automatically
     if LOG_CHANNEL:
         try:
             bot_info = await app.get_me()
@@ -116,7 +115,7 @@ async def shutdown():
     except Exception:
         pass
 
-    gc.collect()  # 🔥 memory cleanup
+    gc.collect()
     logger.info("✅ ᴀɴᴜ ᴜʟᴛɪᴍᴀᴛᴇ ʙᴏᴛ stopped safely")
 
 
@@ -125,7 +124,7 @@ async def shutdown():
 # ============================================================
 
 try:
-    register_all_handlers(app)
+    register_all_handlers(app, db, LOG_CHANNEL)
     logger.info("✅ All handlers loaded!")
 except Exception as e:
     logger.error(f"❌ Handler error: {e}")
@@ -133,7 +132,7 @@ except Exception as e:
 
 
 # ============================================================
-# ❤️ KEEP ALIVE (ANTI-SLEEP)
+# ❤️ KEEP ALIVE
 # ============================================================
 
 @app.on_message(filters.private & filters.text & filters.incoming)
@@ -142,7 +141,7 @@ async def alive_ping(client, message):
 
 
 # ============================================================
-# 🧠 SIGNAL HANDLER (Docker Safe Shutdown)
+# 🧠 SIGNAL HANDLER
 # ============================================================
 
 stop_event = asyncio.Event()
@@ -156,7 +155,7 @@ signal.signal(signal.SIGTERM, handle_signal)
 
 
 # ============================================================
-# ▶️ MAIN RUNNER (ANTI-CRASH LOOP 🔥)
+# ▶️ MAIN RUNNER
 # ============================================================
 
 async def main():
