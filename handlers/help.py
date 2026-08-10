@@ -8,7 +8,7 @@ from db import add_user
 # 🔌 LOADER HOOK (FIXED)
 # ============================================================
 
-def register_start(app, db, LOG_CHANNEL=None):
+def register_help(app, db, LOG_CHANNEL=None):
 
     # ============================================================
     # 📌 START COMMAND
