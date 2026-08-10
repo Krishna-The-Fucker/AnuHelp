@@ -153,10 +153,6 @@ def register_all_handlers(app):
 ╔══════════════════════════════╗
 ║   🤖 BOT SUCCESSFULLY LOADED ║
 ╠══════════════════════════════╣
-║ ✅ All Core Systems Active   ║
-║ 🛡️ Security Systems Online  ║
-║ 🎛 Admin Controls Ready     ║
-║ 🚀 Performance Optimized    ║
-║ 💎 PRO MAX++ MODE ENABLED   ║
+║ ✅ All Core Systems Active        ║
 ╚══════════════════════════════╝
 """)
