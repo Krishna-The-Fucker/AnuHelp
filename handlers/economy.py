@@ -1,33 +1,5 @@
 # ============================================================
-# 💳 ECONOMY & BANKING MODULE (ROSE STYLE & FULL POWER)
-# ============================================================
-
-__mod_name__ = "💳 ᴇᴄᴏɴᴏᴍʏ"
-
-__help__ = """
-*💳 ᴇᴄᴏɴᴏᴍʏ ᴍᴏᴅᴜʟᴇ* — Manage your wealth, protect your balance from robberies, and trade items or cash!
-
-Commands:
-• `/bal` — Check Your Or Friend's Balance
-• `/wallet` — Save Your Balance From Robbery
-• `/rob` — Reply To Someone to rob them
-• `/kill` — Reply To Someone to eliminate them
-• `/revive` — Use With Or Without Reply to revive
-• `/protect` — Protect Yourself From Robbery
-• `/give` — Give Money To Replied User
-• `/toprich` — See Top 10 Richest Users
-• `/topkill` — See Top 10 Killers
-• `/item` — Use With Or Without Reply for items
-• `/rank` — Check Your Or Friend's Rank
-• `/daily` — Claim Free Daily Cash
-• `/gems` — Check Your Gems
-• `/give` — Give Money To Replied User
-"""
-
-from pyrogram import filters
-from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
-
-def register_economy_system(app, db):
+# 
 
     # ============================================================
     # 💰 BALANCE COMMAND (`/bal`)
